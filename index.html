@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nóminas Iberia</title>
+
+<!-- PWA / Añadir a pantalla de inicio -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nóminas IB">
+<meta name="theme-color" content="#0071e3">
+<meta name="description" content="Gestión de nóminas y finanzas Iberia">
+
+<!-- Icono para iOS (pantalla de inicio) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230071e3'/><text y='68' x='50' text-anchor='middle' font-size='58' font-family='system-ui'>✈️</text></svg>">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230071e3'/><text y='68' x='50' text-anchor='middle' font-size='58' font-family='system-ui'>✈️</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f5f7;--card:#fff;--border:#e5e5ea;--text:#1c1c1e;--sub:#6c6c70;
+  --blue:#0071e3;--green:#30d158;--red:#ff453a;--amber:#ff9f0a;--purple:#bf5af2;
+  --blue-bg:#e3f0ff;--green-bg:#d4f5de;--red-bg:#ffeae9;--amber-bg:#fff3e0;
+  --radius:14px;--radius-sm:10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#000;--card:#1c1c1e;--border:#38383a;--text:#f5f5f7;--sub:#98989f;
+  --blue:#0a84ff;--green:#30d158;--red:#ff453a;--amber:#ff9f0a;
+  --blue-bg:#0a2a4a;--green-bg:#0a2a1a;--red-bg:#3a0a0a;--amber-bg:#2a1a00;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+.app{max-width:430px;margin:0 auto}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(28,28,30,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--border);display:flex;z-index:200;padding:8px 0 env(safe-area-inset-bottom,0)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 4px;color:var(--sub);font-size:10px;font-weight:500;letter-spacing:0.2px}
+.nav-btn svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn.active{color:var(--blue)}
+
+/* SCREEN */
+.screen{display:none;padding:16px}
+.screen.active{display:block}
+.page-header{padding:12px 0 20px}
+.page-title{font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.page-sub{font-size:14px;color:var(--sub);margin-top:3px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:0.5px solid var(--border)}
+.card-title{font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}
+
+/* MONTH NAV */
+.month-nav{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;border:0.5px solid var(--border)}
+.month-nav-label{font-size:17px;font-weight:600;color:var(--text)}
+.month-nav button{width:32px;height:32px;border-radius:50%;background:var(--bg);border:0.5px solid var(--border);color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:8px;position:relative}
+.upload-zone:active,.upload-zone.has-file{border-color:var(--blue);background:var(--blue-bg)}
+.upload-zone .uz-icon{font-size:32px;margin-bottom:6px;display:block}
+.upload-zone .uz-title{font-size:15px;font-weight:500;color:var(--text)}
+.upload-zone .uz-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.upload-zone .uz-fname{font-size:12px;color:var(--blue);font-weight:500;margin-top:6px;word-break:break-all}
+.upload-zone .uz-badge{position:absolute;top:10px;right:10px;background:var(--blue);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.15s}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:disabled{opacity:0.35;cursor:not-allowed}
+.btn-outline{background:var(--card);color:var(--blue);border:1px solid var(--blue);margin-top:8px}
+.btn-red{background:var(--red-bg);color:var(--red);margin-top:8px}
+
+/* FIELDS */
+.field-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:0.5px solid var(--border)}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:14px;color:var(--sub);flex:1;padding-right:8px}
+.field-val{font-size:14px;font-weight:500;color:var(--text);text-align:right}
+.field-input{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:14px;width:115px;text-align:right;background:var(--bg);color:var(--text)}
+.field-section{background:var(--bg);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.8px;text-transform:uppercase}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-green{background:var(--green-bg);color:#1a7a35}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-amber{background:var(--amber-bg);color:#8a5000}
+.badge-purple{background:#f0e6ff;color:#6b1fa5}
+
+/* METRIC CARDS */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.metric-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;border:0.5px solid var(--border)}
+.metric-label{font-size:11px;color:var(--sub);font-weight:500;margin-bottom:5px}
+.metric-val{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.metric-val.blue{color:var(--blue)}
+.metric-val.green{color:#1a7a35}
+.metric-val.red{color:var(--red)}
+.metric-val.amber{color:#8a5000}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;color:var(--sub);font-weight:600;padding:7px 6px;border-bottom:0.5px solid var(--border);white-space:nowrap}
+.data-table td{padding:8px 6px;border-bottom:0.5px solid var(--border);color:var(--text)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table .num{text-align:right;font-variant-numeric:tabular-nums;font-family:monospace;font-size:12px}
+.data-table .total-row td{font-weight:700;color:var(--blue);border-top:1px solid var(--border)}
+.data-table .warn-row td{color:var(--red)}
+
+/* ALERT */
+.alert{padding:12px 14px;border-radius:var(--radius-sm);font-size:14px;line-height:1.5;margin-bottom:12px;font-weight:500}
+.alert-green{background:var(--green-bg);color:#1a5c2a}
+.alert-red{background:var(--red-bg);color:#8a1a1a}
+.alert-amber{background:var(--amber-bg);color:#6a3a00}
+.alert-blue{background:var(--blue-bg);color:#003a8a}
+
+/* SPINNER */
+.spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px;border:0.5px solid var(--border)}
+.tab{flex:1;padding:7px 4px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;color:var(--sub);border:none;background:none;transition:all 0.2s}
+.tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.12)}
+
+/* GASTOS */
+.cat-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:0.5px solid var(--border)}
+.cat-item:last-child{border-bottom:none}
+.cat-icon-wrap{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.cat-info{flex:1;min-width:0}
+.cat-name{font-size:14px;font-weight:500;color:var(--text)}
+.cat-pct{font-size:11px;color:var(--sub)}
+.cat-bar{height:3px;border-radius:2px;background:var(--border);margin-top:4px}
+.cat-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.cat-input{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:14px;width:85px;text-align:right;background:var(--bg);color:var(--text);flex-shrink:0}
+.cat-del{background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0}
+
+/* ADD ROW */
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);color:var(--text)}
+.add-row .add-btn{width:40px;height:40px;background:var(--blue);border:none;border-radius:8px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* PROGRESS */
+.prog-item{margin-bottom:14px}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.prog-label{font-size:13px;color:var(--text);font-weight:500}
+.prog-right{font-size:12px;color:var(--sub)}
+.prog-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width 0.4s}
+
+/* OBJ */
+.obj-item{padding:12px 0;border-bottom:0.5px solid var(--border)}
+.obj-item:last-child{border-bottom:none}
+.obj-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.obj-name{font-size:15px;font-weight:500;color:var(--text)}
+.obj-amounts{font-size:12px;color:var(--sub);margin-bottom:6px}
+.obj-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.obj-fill{height:100%;border-radius:3px;background:var(--blue)}
+.obj-saved-input{border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:12px;width:90px;text-align:right;background:var(--bg);color:var(--text)}
+.obj-del{background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;text-decoration:underline}
+
+/* CHART */
+.donut-wrap{position:relative;height:180px}
+#pieChart{position:relative;height:180px}
+
+/* SAVED MONTHS */
+.months-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.m-pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--card);border:0.5px solid var(--border);color:var(--sub);cursor:pointer}
+.m-pill.has-data{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
+
+.tipo-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;display:inline-block;margin-left:4px;vertical-align:middle}
+.tipo-mensual{background:#e3f0ff;color:#004db3}
+.tipo-atrasos{background:#fff3e0;color:#7a4000}
+.tipo-extra{background:#f0e6ff;color:#6b1fa5}
+
+/* PASTEL */
+.p-blue{background:#dbeafe;color:#1e40af}.p-indigo{background:#e0e7ff;color:#3730a3}
+.p-violet{background:#ede9fe;color:#5b21b6}.p-pink{background:#fce7f3;color:#9d174d}
+.p-rose{background:#ffe4e6;color:#9f1239}.p-orange{background:#ffedd5;color:#9a3412}
+.p-amber{background:#fef3c7;color:#92400e}.p-lime{background:#ecfccb;color:#3f6212}
+.p-green{background:#dcfce7;color:#166534}.p-teal{background:#ccfbf1;color:#134e4a}
+.p-cyan{background:#cffafe;color:#164e63}
+@media(prefers-color-scheme:dark){
+.p-blue{background:#1e3a5f;color:#93c5fd}.p-indigo{background:#1e1b4b;color:#a5b4fc}
+.p-violet{background:#2e1065;color:#c4b5fd}.p-pink{background:#500724;color:#f9a8d4}
+.p-rose{background:#4c0519;color:#fda4af}.p-orange{background:#431407;color:#fdba74}
+.p-amber{background:#451a03;color:#fcd34d}.p-lime{background:#1a2e05;color:#bef264}
+.p-green{background:#052e16;color:#86efac}.p-teal{background:#042f2e;color:#5eead4}
+.p-cyan{background:#083344;color:#67e8f9}}
+
+/* ANNUAL */
+.ay-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ay-nav span{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.ay-nav button{width:36px;height:36px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);color:var(--sub);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.kpi3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.kpi3 .kc{border-radius:14px;padding:12px 8px;text-align:center}
+.kpi3 .kc-v{font-size:15px;font-weight:800;letter-spacing:-0.3px;word-break:break-all}
+.kpi3 .kc-l{font-size:10px;font-weight:500;opacity:0.65;margin-top:2px}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.bigc{border-radius:16px;padding:16px}
+.bigc .bc-l{font-size:11px;font-weight:600;opacity:0.65;margin-bottom:4px}
+.bigc .bc-v{font-size:24px;font-weight:800;letter-spacing:-0.8px}
+.bigc .bc-s{font-size:11px;opacity:0.55;margin-top:3px}
+.mc{border-radius:14px;padding:14px;margin-bottom:8px}
+.mc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mc-mes{font-size:15px;font-weight:700}
+.mc-g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.mc-g .mi{}.mc-g .mi-l{font-size:10px;font-weight:600;opacity:0.55;margin-bottom:1px}
+.mc-g .mi-v{font-size:14px;font-weight:700}
+.mc-sep{height:0.5px;background:currentColor;opacity:0.12;margin:8px 0}
+.mc-c{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;opacity:0.8}
+.mc-c span:last-child{font-weight:600}
+.mc-empty{text-align:center;padding:14px;font-size:13px;opacity:0.4}
+.conc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.conc-row:last-child{border-bottom:none}
+.conc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:8px}
+.anual-tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:14px;border:0.5px solid var(--border)}
+.anual-tab{flex:1;padding:7px 2px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;border-radius:8px;color:var(--sub);border:none;background:none;transition:all 0.2s}
+.anual-tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.12)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SCREEN: NÓMINAS -->
+<div id="sc-nominas" class="screen active">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div class="page-title">Nóminas</div>
+      <div class="page-sub">Extracción automática con IA</div>
+    </div>
+    <button onclick="syncFromCloud()" style="background:var(--blue-bg);border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;margin-top:4px">
+      ☁️ Actualizar
+    </button>
+  </div>
+
+  <div class="month-nav">
+    <button onclick="changeMonth(-1)">‹</button>
+    <span class="month-nav-label" id="nom-month-label">Junio 2026</span>
+    <button onclick="changeMonth(1)">›</button>
+  </div>
+
+  <!-- Months with data pills -->
+  <div class="months-pills" id="months-pills"></div>
+
+  <div class="card">
+    <div class="card-title">📄 Nómina mensual</div>
+    <div class="upload-zone" id="zone-mensual" onclick="triggerUpload('mensual')">
+      <span class="uz-icon">📋</span>
+      <div class="uz-title">Toca para subir el PDF</div>
+      <div class="uz-sub">Nómina regular del mes</div>
+    </div>
+    <input type="file" id="file-mensual" accept=".pdf" style="display:none" onchange="handleFile('mensual',this)">
+    <button class="btn btn-blue" id="btn-analyze-mensual" onclick="analyzeSlot('mensual')" disabled style="margin-top:10px">
+      <span>🤖</span> Analizar nómina mensual
+    </button>
+    <div id="results-mensual" style="display:none;margin-top:12px"></div>
+    <button class="btn btn-blue" id="btn-save-mensual" onclick="saveSlot('mensual')" style="display:none;margin-top:8px">
+      💾 Guardar nómina mensual
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📑 Atrasos / Extra / Complementos</div>
+    <div class="upload-zone" id="zone-extra" onclick="triggerUpload('extra')">
+      <span class="uz-icon">📂</span>
+      <div class="uz-title">Toca para subir PDF adicional</div>
+      <div class="uz-sub">Atrasos, paga extra, nóminas complementarias...</div>
+    </div>
+    <input type="file" id="file-extra" accept=".pdf" style="display:none" onchange="handleFile('extra',this)">
+    <button class="btn btn-blue" id="btn-analyze-extra" onclick="analyzeSlot('extra')" disabled style="margin-top:10px">
+      <span>🤖</span> Analizar atrasos / extra
+    </button>
+    <div id="results-extra" style="display:none;margin-top:12px"></div>
+    <button class="btn btn-blue" id="btn-save-extra" onclick="saveSlot('extra')" style="display:none;margin-top:8px">
+      💾 Guardar atrasos / extra
+    </button>
+    <p style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.5">
+      Puedes subir cada PDF en días distintos — se acumulan sin borrar lo ya guardado.
+    </p>
+  </div>
+
+  <!-- PANEL DE VERIFICACIÓN: datos guardados del mes seleccionado -->
+  <div id="verify-panel" style="display:none;margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:15px;font-weight:600;color:var(--text)" id="verify-title">Datos guardados</span>
+      <div style="display:flex;gap:6px">
+        <button onclick="deleteMonthData()" style="padding:5px 10px;border-radius:8px;background:#fee2e2;color:#991b1b;border:none;font-size:12px;font-weight:600;cursor:pointer">🗑 Borrar</button>
+        <button onclick="closeVerify()" style="padding:5px 10px;border-radius:8px;background:var(--bg);border:0.5px solid var(--border);color:var(--sub);font-size:12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="verify-entries"></div>
+  </div>
+</div>
+
+<!-- SCREEN: IRPF -->
+<div id="sc-irpf" class="screen">
+  <div class="page-header">
+    <div class="page-title">IRPF</div>
+    <div class="page-sub">Seguimiento anual de retenciones</div>
+  </div>
+
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+    <button onclick="changeIRPFYear(-1)" style="background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:14px">‹</button>
+    <span style="flex:1;text-align:center;font-size:16px;font-weight:600" id="irpf-year-label">2026</span>
+    <button onclick="changeIRPFYear(1)" style="background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:14px">›</button>
+  </div>
+
+  <div id="irpf-alert"></div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Base imponible</div>
+      <div class="metric-val blue" id="irpf-base">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Ret. total IRPF</div>
+      <div class="metric-val" id="irpf-ret">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">% retención medio</div>
+      <div class="metric-val" id="irpf-pct">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Salario líquido</div>
+      <div class="metric-val green" id="irpf-liq">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Desglose mensual</div>
+    <div style="overflow-x:auto">
+    <table class="data-table" id="irpf-table">
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Tipo</th>
+          <th class="num">SB Fiscal</th>
+          <th class="num">IRPF</th>
+          <th class="num">%</th>
+          <th class="num">Líquido</th>
+        </tr>
+      </thead>
+      <tbody id="irpf-tbody">
+        <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--sub);font-size:13px">Sube nóminas para ver datos</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Conceptos exentos de IRPF</div>
+    <div class="field-row">
+      <span class="field-label">🟢 Dieta desplaz. vuelo (IB032) — Exento</span>
+      <span class="field-val badge badge-green" id="irpf-dietas">—</span>
+    </div>
+    <div class="field-row" style="border:none">
+      <span class="field-label" style="font-size:12px;color:var(--sub)">Solo IB032 está exento. IB132 (Dietas Exceso Topes) sí tributa.</span>
+    </div>
+  </div>
+
+  <div class="card" id="irpf-detail-card">
+    <div class="card-title">Totales por concepto</div>
+    <div id="irpf-totals"></div>
+  </div>
+</div>
+
+<!-- SCREEN: GASTOS -->
+<div id="sc-gastos" class="screen">
+  <div class="page-header">
+    <div class="page-title">Finanzas</div>
+    <div class="page-sub">Gastos, ahorro e inversión</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchGastoTab('gastos')">Gastos</button>
+    <button class="tab" onclick="switchGastoTab('balance')">Balance</button>
+    <button class="tab" onclick="switchGastoTab('objetivos')">Objetivos</button>
+  </div>
+
+  <!-- TAB GASTOS -->
+  <div id="gtab-gastos">
+    <div class="month-nav">
+      <button onclick="changeGastoMonth(-1)">‹</button>
+      <span class="month-nav-label" id="gasto-month-label">Junio 2026</span>
+      <button onclick="changeGastoMonth(1)">›</button>
+    </div>
+
+    <!-- Ingreso banner -->
+    <div style="border-radius:16px;padding:16px 18px;margin-bottom:10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff">
+      <div style="font-size:11px;font-weight:600;opacity:0.8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.8px">Ingresos del mes</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:10px;opacity:0.7;margin-bottom:2px">Salario líquido</div>
+          <input type="number" id="ing-salario" placeholder="0" oninput="saveIngresos();recalc()"
+            style="width:100%;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 10px;font-size:15px;font-weight:700;color:#fff;outline:none">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:10px;opacity:0.7;margin-bottom:2px">Otros ingresos</div>
+          <input type="number" id="ing-otros" placeholder="0" oninput="saveIngresos();recalc()"
+            style="width:100%;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 10px;font-size:15px;font-weight:700;color:#fff;outline:none">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.25);padding-top:10px">
+        <span style="font-size:13px;font-weight:600;opacity:0.9">Total ingresos</span>
+        <span style="font-size:22px;font-weight:800;letter-spacing:-0.5px" id="ing-total">0 €</span>
+      </div>
+    </div>
+
+    <!-- Gastos fijos banner -->
+    <div style="border-radius:14px;padding:10px 14px;margin-bottom:6px;background:#1e3a5f;color:#93c5fd;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px">📌 Gastos fijos</span>
+      <span style="font-size:16px;font-weight:800" id="g-total-fijos">0 €</span>
+    </div>
+    <div id="cat-list-fijos"></div>
+
+    <!-- Gastos variables banner -->
+    <div style="border-radius:14px;padding:10px 14px;margin-top:10px;margin-bottom:6px;background:#3b1a0a;color:#fdba74;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px">🔄 Gastos variables</span>
+      <span style="font-size:16px;font-weight:800" id="g-total-variables">0 €</span>
+    </div>
+    <div id="cat-list-variables"></div>
+
+    <!-- Gastos anuales prorrateados -->
+    <div style="border-radius:14px;padding:10px 14px;margin-top:10px;margin-bottom:6px;background:#0a2a1a;color:#86efac;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px">📅 Anuales (prorrata)</span>
+      <span style="font-size:16px;font-weight:800" id="g-total-anuales">0 €</span>
+    </div>
+    <div id="cat-list-anuales"></div>
+
+    <button onclick="addCategoryModal()" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;background:var(--card);border:1.5px dashed var(--border);color:var(--sub);font-size:14px;font-weight:500;cursor:pointer">+ Añadir categoría</button>
+
+    <!-- Bottom summary bar -->
+    <div style="border-radius:16px;padding:16px;margin-top:10px;background:var(--card);border:0.5px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#fee2e2;border-radius:10px;padding:10px">
+          <div style="font-size:10px;font-weight:600;color:#991b1b;opacity:0.8">TOTAL GASTOS</div>
+          <div style="font-size:18px;font-weight:800;color:#991b1b" id="g-total-gastos">0 €</div>
+        </div>
+        <div id="g-disponible-card" style="border-radius:10px;padding:10px;background:#dcfce7">
+          <div style="font-size:10px;font-weight:600;color:#166534;opacity:0.8">DISPONIBLE</div>
+          <div style="font-size:18px;font-weight:800;color:#166534" id="g-disponible">0 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add category modal (inline) -->
+    <div id="add-cat-panel" style="display:none;background:var(--card);border-radius:16px;padding:16px;margin-top:10px;border:0.5px solid var(--border)">
+      <div style="font-size:14px;font-weight:600;margin-bottom:10px">Nueva categoría</div>
+      <input type="text" id="new-cat-name" placeholder="Nombre de la categoría"
+        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;background:var(--bg);color:var(--text);margin-bottom:8px">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select id="new-cat-tipo" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;background:var(--bg);color:var(--text)">
+          <option value="fijo">Fijo</option>
+          <option value="variable">Variable</option>
+          <option value="anual">Anual (prorrata)</option>
+        </select>
+        <input type="number" id="new-cat-anual-importe" placeholder="Importe anual €"
+          style="flex:1;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;background:var(--bg);color:var(--text);display:none">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="addCategory()" style="flex:1;padding:10px;background:#0071e3;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Añadir</button>
+        <button onclick="document.getElementById('add-cat-panel').style.display='none'" style="padding:10px 14px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--sub)">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BALANCE -->
+  <div id="gtab-balance" style="display:none">
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Ingresos</div>
+        <div class="metric-val blue" id="b-ingresos">0 €</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Gastos</div>
+        <div class="metric-val red" id="b-gastos">0 €</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Disponible</div>
+        <div class="metric-val" id="b-disponible">0 €</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Tasa ahorro</div>
+        <div class="metric-val" id="b-tasa">0%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Distribución gastos</div>
+      <div class="donut-wrap">
+        <canvas id="pieChart" role="img" aria-label="Distribución de gastos por categoría"></canvas>
+      </div>
+      <div id="pie-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Regla 50/30/20</div>
+      <div id="regla5030"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Evolución mensual</div>
+      <div style="position:relative;height:200px">
+        <canvas id="lineChart" role="img" aria-label="Evolución mensual de ingresos y gastos"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB OBJETIVOS -->
+  <div id="gtab-objetivos" style="display:none">
+    <div class="card">
+      <div class="card-title">🎯 Objetivos de ahorro</div>
+      <div id="obj-list"></div>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <input type="text" id="obj-name" placeholder="Nombre del objetivo" style="flex:1;min-width:130px;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;background:var(--bg);color:var(--text)">
+        <input type="number" id="obj-target" placeholder="Meta €" style="width:90px;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;background:var(--bg);color:var(--text)">
+        <button class="add-btn" onclick="addObjetivo()" style="width:40px;flex-shrink:0">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 Calculadora de inversión</div>
+      <div class="field-row">
+        <span class="field-label">Aportación mensual</span>
+        <input class="field-input" type="number" id="inv-mensual" placeholder="0" oninput="calcInversion()">
+      </div>
+      <div class="field-row">
+        <span class="field-label">Rentabilidad anual (%)</span>
+        <input class="field-input" type="number" id="inv-tasa" value="7" oninput="calcInversion()">
+      </div>
+      <div class="field-row">
+        <span class="field-label">Años de inversión</span>
+        <input class="field-input" type="number" id="inv-anos" value="20" oninput="calcInversion()">
+      </div>
+      <div id="inv-result" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: ANUAL -->
+<div id="sc-anual" class="screen">
+  <div class="page-header">
+    <div class="page-title">Vista anual</div>
+    <div class="page-sub">Resumen completo del ejercicio</div>
+  </div>
+
+  <div class="ay-nav">
+    <button onclick="changeAnualYear(-1)">‹</button>
+    <span id="anual-year-label">2026</span>
+    <button onclick="changeAnualYear(1)">›</button>
+  </div>
+
+  <div class="anual-tabs">
+    <button class="anual-tab active" onclick="switchAnualTab('resumen')">Resumen</button>
+    <button class="anual-tab" onclick="switchAnualTab('meses')">Por mes</button>
+    <button class="anual-tab" onclick="switchAnualTab('conceptos')">Conceptos</button>
+    <button class="anual-tab" onclick="switchAnualTab('grafico')">Gráfico</button>
+  </div>
+
+  <!-- TAB RESUMEN -->
+  <div id="atab-resumen">
+    <div class="big2">
+      <div class="bigc p-blue">
+        <div class="bc-l">Bruto fiscal total</div>
+        <div class="bc-v" id="ay-bruto">—</div>
+        <div class="bc-s">Base imponible IRPF</div>
+      </div>
+      <div class="bigc p-green">
+        <div class="bc-l">Líquido total</div>
+        <div class="bc-v" id="ay-liq">—</div>
+        <div class="bc-s">Lo que has cobrado</div>
+      </div>
+    </div>
+    <div class="kpi3">
+      <div class="kc p-violet">
+        <div class="kc-v" id="ay-irpf-total">—</div>
+        <div class="kc-l">IRPF retenido</div>
+      </div>
+      <div class="kc p-amber">
+        <div class="kc-v" id="ay-ss-total">—</div>
+        <div class="kc-l">Cuotas SS</div>
+      </div>
+      <div class="kc p-teal">
+        <div class="kc-v" id="ay-pct-irpf">—</div>
+        <div class="kc-l">% IRPF medio</div>
+      </div>
+    </div>
+    <div class="kpi3" style="margin-bottom:14px">
+      <div class="kc p-rose">
+        <div class="kc-v" id="ay-dieta-exenta">—</div>
+        <div class="kc-l">Dietas exentas IB032</div>
+      </div>
+      <div class="kc p-orange">
+        <div class="kc-v" id="ay-dieta-tributa">—</div>
+        <div class="kc-l">Dietas IB132 (tributa)</div>
+      </div>
+      <div class="kc p-lime">
+        <div class="kc-v" id="ay-prestamo">—</div>
+        <div class="kc-l">Préstamo Iberia</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Meses con datos</div>
+      <div id="ay-meses-resumen"></div>
+    </div>
+    <div class="card" style="background:var(--amber-bg);border-color:#f59e0b">
+      <div class="card-title" style="color:#92400e">⚠️ Para la declaración de la renta</div>
+      <div id="ay-renta-nota" style="font-size:13px;color:#92400e;line-height:1.6"></div>
+    </div>
+  </div>
+
+  <!-- TAB MESES -->
+  <div id="atab-meses" style="display:none">
+    <div id="ay-meses-cards"></div>
+  </div>
+
+  <!-- TAB CONCEPTOS -->
+  <div id="atab-conceptos" style="display:none">
+    <div class="card">
+      <div class="card-title">Devengos — totales anuales</div>
+      <div id="ay-conc-devengos"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Deducciones — totales anuales</div>
+      <div id="ay-conc-deducc"></div>
+    </div>
+  </div>
+
+  <!-- TAB GRÁFICO -->
+  <div id="atab-grafico" style="display:none">
+    <div class="card">
+      <div class="card-title">Bruto vs Líquido por mes</div>
+      <div style="position:relative;height:220px">
+        <canvas id="ay-bar-chart" role="img" aria-label="Comparativa bruto y líquido mensual"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Retención IRPF mensual</div>
+      <div style="position:relative;height:180px">
+        <canvas id="ay-irpf-chart" role="img" aria-label="Retención IRPF mensual"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Evolución % IRPF</div>
+      <div style="position:relative;height:180px">
+        <canvas id="ay-pct-chart" role="img" aria-label="Porcentaje IRPF mensual"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: AJUSTES -->
+<div id="sc-ajustes" class="screen">
+  <div class="page-header">
+    <div class="page-title">Ajustes</div>
+    <div class="page-sub">Configuración de la app</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🤖 IA para analizar nóminas</div>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:14px;line-height:1.5">
+      La app usa Gemini (gratis) para analizar PDFs. Introduce tu API key de Google AI Studio.
+      Si tienes API key de Anthropic también puedes añadirla — se usará como preferencia.
+    </p>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">
+        🟢 Gemini API Key <span style="font-size:11px;font-weight:400;color:var(--sub)">(gratuito · aistudio.google.com)</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="gemini-key-input" placeholder="AIza..."
+          style="flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);color:var(--text)">
+        <button onclick="saveGeminiKey()"
+          style="padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+          Guardar
+        </button>
+      </div>
+      <div id="gemini-key-status" style="font-size:12px;margin-top:6px;color:var(--sub)"></div>
+    </div>
+
+    <div style="border-top:0.5px solid var(--border);padding-top:14px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">
+        🔵 Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--sub)">(de pago · opcional)</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="anthropic-key-input" placeholder="sk-ant-..."
+          style="flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);color:var(--text)">
+        <button onclick="saveAnthropicKey()"
+          style="padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+          Guardar
+        </button>
+      </div>
+      <div id="anthropic-key-status" style="font-size:12px;margin-top:6px;color:var(--sub)"></div>
+    </div>
+
+    <div style="border-top:0.5px solid var(--border);padding-top:14px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">
+        🟠 Groq API Key <span style="font-size:11px;font-weight:400;color:var(--sub)">(gratuito · console.groq.com)</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:8px;line-height:1.5">
+        Alternativa gratuita a Gemini. Muy rápida. Crea tu key en console.groq.com → API Keys.
+      </div>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="groq-key-input" placeholder="gsk_..."
+          style="flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);color:var(--text)">
+        <button onclick="saveGroqKey()"
+          style="padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+          Guardar
+        </button>
+      </div>
+      <div id="groq-key-status" style="font-size:12px;margin-top:6px;color:var(--sub)"></div>
+    </div>
+
+    <div style="background:var(--bg);border-radius:10px;padding:12px;margin-top:14px;font-size:12px;color:var(--sub);line-height:1.6">
+      <strong>Orden de prioridad:</strong><br>
+      1º Anthropic (si tienes key y funciona)<br>
+      2º Gemini (gratuito)<br>
+      3º Groq (gratuito · alternativa)<br>
+      Las keys se guardan solo en este dispositivo, nunca en la nube.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">☁️ Sincronización</div>
+    <div class="field-row">
+      <span class="field-label">Estado de la nube</span>
+      <span id="settings-cloud-status" class="badge badge-green">—</span>
+    </div>
+    <div class="field-row" style="border:none">
+      <span class="field-label">Base de datos</span>
+      <span style="font-size:12px;color:var(--sub)">Supabase · ugfghsmf...</span>
+    </div>
+    <button onclick="syncFromCloud();renderSettingsScreen()"
+      style="width:100%;margin-top:10px;padding:11px;border-radius:10px;background:var(--blue-bg);color:var(--blue);border:none;font-size:14px;font-weight:600;cursor:pointer">
+      ☁️ Forzar sincronización ahora
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Datos guardados</div>
+    <div id="settings-data-info"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('nominas')" id="nav-nominas">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Nóminas
+  </button>
+  <button class="nav-btn" onclick="showScreen('irpf')" id="nav-irpf">
+    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="7" y1="9" x2="9" y2="9"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+    IRPF
+  </button>
+  <button class="nav-btn" onclick="showScreen('gastos')" id="nav-gastos">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Finanzas
+  </button>
+  <button class="nav-btn" onclick="showScreen('anual')" id="nav-anual">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="2.5" stroke-linecap="round"/><line x1="12" y1="14" x2="12" y2="14" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="14" x2="16" y2="14" stroke-width="2.5" stroke-linecap="round"/><line x1="8" y1="18" x2="8" y2="18" stroke-width="2.5" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="18" stroke-width="2.5" stroke-linecap="round"/></svg>
+    Anual
+  </button>
+  <button class="nav-btn" onclick="showScreen('ajustes')" id="nav-ajustes">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Ajustes
+  </button>
+</nav>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MSHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const CAT_COLORS = ['#0071e3','#30a46c','#e95c2e','#c065c0','#e8a000','#0891b2','#dc2626','#7c3aed'];
+const CAT_EMOJIS = {
+  'Vivienda':'🏠','Hipoteca':'🏦','Alquiler':'🏠','Alimentación':'🛒','Transporte':'🚗','Préstamo coche':'🚗',
+  'Ocio':'🎭','Inversión y ahorro':'📈','Seguros y salud':'❤️','Suscripciones':'📱',
+  'Comunidad':'🏘️','Préstamo papis':'👨‍👩‍👧','Gastos varios':'💳','Gastos extras':'🎯',
+  'Seguro coche':'🚗','Seguro casa':'🏡','Préstamo Iberia':'✈️'
+};
+// Color map per category name for vivid Excel-like colors
+const CAT_BG_MAP = {
+  'Vivienda':'#3b82f6','Hipoteca':'#2563eb','Alquiler':'#1d4ed8',
+  'Alimentación':'#f97316','Transporte':'#eab308','Préstamo coche':'#ca8a04',
+  'Ocio':'#a855f7','Inversión y ahorro':'#22c55e','Seguros y salud':'#ef4444',
+  'Suscripciones':'#06b6d4','Comunidad':'#84cc16','Préstamo papis':'#f59e0b',
+  'Gastos varios':'#6366f1','Gastos extras':'#ec4899','Seguro coche':'#14b8a6','Seguro casa':'#8b5cf6'
+};
+const DEFAULT_CATS = [
+  {name:'Alquiler', tipo:'fijo', emoji:'🏠', color:'#1d4ed8'},
+  {name:'Hipoteca', tipo:'fijo', emoji:'🏦', color:'#2563eb'},
+  {name:'Préstamo papis', tipo:'fijo', emoji:'👨‍👩‍👧', color:'#f59e0b'},
+  {name:'Comunidad', tipo:'fijo', emoji:'🏘️', color:'#84cc16'},
+  {name:'Préstamo coche', tipo:'fijo', emoji:'🚗', color:'#ca8a04'},
+  {name:'Alimentación', tipo:'variable', emoji:'🛒', color:'#f97316'},
+  {name:'Ocio', tipo:'variable', emoji:'🎭', color:'#a855f7'},
+  {name:'Gastos varios', tipo:'variable', emoji:'💳', color:'#6366f1'},
+  {name:'Gastos extras', tipo:'variable', emoji:'🎯', color:'#ec4899'},
+  {name:'Inversión y ahorro', tipo:'variable', emoji:'📈', color:'#22c55e'},
+  {name:'Seguro coche', tipo:'anual', emoji:'🚗', color:'#14b8a6', anual: 879.65},
+  {name:'Seguro casa', tipo:'anual', emoji:'🏡', color:'#8b5cf6', anual: 268.40},
+];
+
+let nomMonth = 5, nomYear = 2026;
+let irpfYear = 2026;
+let gastoMonth = 5, gastoYear = 2026;
+let files = {mensual: null, extra: null};
+let extracted = {mensual: null, extra: null};
+let pieChart = null, lineChart = null;
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────
+// ─── SUPABASE CONFIG ──────────────────────────────────────────────────────
+const SB_URL = 'https://ugfghsmfjnitzduvjtju.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZmdoc21mam5pdHpkdXZqdGp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkzNjAsImV4cCI6MjA5NzgwNTM2MH0.b5KJ7_KLq0QrAWD6l_1a0dHtGNm7eLYajdu1Lm3Vgys';
+const SB_HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY,
+  'Prefer': 'return=representation'
+};
+const ROW_ID = 'main';
+let _syncTimeout = null;
+let _cloudAvailable = true;
+
+// Indicador de sync en la UI
+function showSyncStatus(status) {
+  let el = document.getElementById('sync-indicator');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-indicator';
+    el.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9998;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;transition:all 0.3s';
+    document.body.appendChild(el);
+  }
+  const states = {
+    syncing: { bg:'#fef3c7', color:'#92400e', text:'⏫ Guardando...' },
+    ok:      { bg:'#dcfce7', color:'#166534', text:'☁️ Sincronizado' },
+    offline: { bg:'#fee2e2', color:'#991b1b', text:'📵 Sin conexión' },
+    loading: { bg:'#dbeafe', color:'#1e40af', text:'⏬ Cargando...' },
+  };
+  const s = states[status] || states.ok;
+  el.style.background = s.bg;
+  el.style.color = s.color;
+  el.textContent = s.text;
+  el.style.display = 'block';
+  if (status === 'ok') setTimeout(() => { if(el) el.style.display='none'; }, 3000);
+}
+
+// ─── CLOUD STORAGE ────────────────────────────────────────────────────────
+async function cloudLoad() {
+  try {
+    showSyncStatus('loading');
+    const res = await fetch(`${SB_URL}/rest/v1/nominas_data?id=eq.${ROW_ID}&select=data`, {
+      headers: SB_HEADERS
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    if (rows && rows.length > 0 && rows[0].data) {
+      const data = rows[0].data;
+      localStorage.setItem('iberia_v3', JSON.stringify(data));
+      _cloudAvailable = true;
+      showSyncStatus('ok');
+      return data;
+    }
+    showSyncStatus('ok');
+    return null;
+  } catch(e) {
+    console.warn('Cloud load failed, using local cache:', e.message);
+    _cloudAvailable = false;
+    showSyncStatus('offline');
+    return null;
+  }
+}
+
+async function cloudSave(state) {
+  // Guardar localmente siempre (inmediato)
+  localStorage.setItem('iberia_v3', JSON.stringify(state));
+
+  // Debounce: esperar 800ms antes de subir a la nube
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(async () => {
+    try {
+      showSyncStatus('syncing');
+      // Upsert: crea la fila si no existe, actualiza si ya existe
+      const res = await fetch(`${SB_URL}/rest/v1/nominas_data`, {
+        method: 'POST',
+        headers: {
+          ...SB_HEADERS,
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify({ id: ROW_ID, data: state, updated_at: new Date().toISOString() })
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`HTTP ${res.status}: ${err}`);
+      }
+      _cloudAvailable = true;
+      showSyncStatus('ok');
+    } catch(e) {
+      console.warn('Cloud save failed:', e.message);
+      _cloudAvailable = false;
+      showSyncStatus('offline');
+    }
+  }, 800);
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+function ls(k, v) {
+  if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null');
+  localStorage.setItem(k, JSON.stringify(v));
+}
+
+function loadState() {
+  let s = ls('iberia_v3');
+  if (!s) s = { months: {}, categories: DEFAULT_CATS.map(c => ({...c})), objectives: [], gastoMeta: {} };
+  if (!s.categories) s.categories = DEFAULT_CATS.map(c => ({...c}));
+  if (!s.objectives) s.objectives = [];
+  if (!s.gastoMeta) s.gastoMeta = {};
+  s.categories = s.categories.map((c,i) => ({
+    tipo: 'variable', emoji: CAT_EMOJIS[c.name]||'💰',
+    color: CAT_BG_MAP[c.name] || CAT_COLORS[i % CAT_COLORS.length],
+    ...c
+  }));
+  return s;
+}
+
+function saveState(s) {
+  cloudSave(s); // guarda local + sube a nube
+}
+
+// ─── INIT CON CARGA DE NUBE ───────────────────────────────────────────────
+async function initApp() {
+  const cloudData = await cloudLoad();
+  if (cloudData) {
+    localStorage.setItem('iberia_v3', JSON.stringify(cloudData));
+  }
+  renderMonthPills();
+  calcInversion();
+}
+
+async function syncFromCloud() {
+  const cloudData = await cloudLoad();
+  if (cloudData) {
+    localStorage.setItem('iberia_v3', JSON.stringify(cloudData));
+    renderMonthPills();
+    renderIRPF();
+    renderGastos();
+  }
+}
+
+// ─── API KEYS (guardadas solo en localStorage, nunca en nube) ─────────────
+function getGeminiKey() { return localStorage.getItem('gemini_api_key') || ''; }
+function getAnthropicKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+function getGroqKey() { return localStorage.getItem('groq_api_key') || ''; }
+
+function saveGeminiKey() {
+  const val = document.getElementById('gemini-key-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('gemini_api_key', val);
+  document.getElementById('gemini-key-input').value = '';
+  document.getElementById('gemini-key-status').innerHTML = '✅ Guardada correctamente';
+  document.getElementById('gemini-key-status').style.color = '#166534';
+}
+
+function saveAnthropicKey() {
+  const val = document.getElementById('anthropic-key-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('anthropic_api_key', val);
+  document.getElementById('anthropic-key-input').value = '';
+  document.getElementById('anthropic-key-status').innerHTML = '✅ Guardada correctamente';
+  document.getElementById('anthropic-key-status').style.color = '#166534';
+}
+
+function saveGroqKey() {
+  const val = document.getElementById('groq-key-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('groq_api_key', val);
+  document.getElementById('groq-key-input').value = '';
+  document.getElementById('groq-key-status').innerHTML = '✅ Guardada correctamente';
+  document.getElementById('groq-key-status').style.color = '#166534';
+}
+
+function renderSettingsScreen() {
+  const gKey = getGeminiKey();
+  const aKey = getAnthropicKey();
+  const rKey = getGroqKey();
+  const gStatus = document.getElementById('gemini-key-status');
+  const aStatus = document.getElementById('anthropic-key-status');
+  const rStatus = document.getElementById('groq-key-status');
+  if (gStatus) { gStatus.innerHTML = gKey ? `✅ Key configurada (${gKey.substring(0,8)}...)` : '⚠️ Sin configurar'; gStatus.style.color = gKey ? '#166534' : '#92400e'; }
+  if (aStatus) { aStatus.innerHTML = aKey ? `✅ Key configurada (${aKey.substring(0,8)}...)` : 'Opcional'; aStatus.style.color = aKey ? '#166534' : 'var(--sub)'; }
+  if (rStatus) { rStatus.innerHTML = rKey ? `✅ Key configurada (${rKey.substring(0,8)}...)` : '⚠️ Sin configurar'; rStatus.style.color = rKey ? '#166534' : '#92400e'; }
+
+  const cloudEl = document.getElementById('settings-cloud-status');
+  if (cloudEl) { cloudEl.textContent = _cloudAvailable ? 'Conectado ✅' : 'Sin conexión ⚠️'; cloudEl.className = _cloudAvailable ? 'badge badge-green' : 'badge badge-red'; }
+
+  const state = loadState();
+  const mesesConDatos = Object.keys(state.months || {}).length;
+  const totalDocs = Object.values(state.months || {}).reduce((a, m) => a + (m?.length || 0), 0);
+  const dataEl = document.getElementById('settings-data-info');
+  if (dataEl) dataEl.innerHTML = `
+    <div class="field-row"><span class="field-label">Meses guardados</span><span class="field-val">${mesesConDatos}</span></div>
+    <div class="field-row"><span class="field-label">Documentos totales</span><span class="field-val">${totalDocs}</span></div>
+    <div class="field-row" style="border:none"><span class="field-label">Categorías de gasto</span><span class="field-val">${(state.categories||[]).length}</span></div>`;
+}
+
+// ─── DUAL/TRIPLE-PROVIDER API CALL ───────────────────────────────────────
+async function callAPI(b64, prompt, maxTokens, retryCount = 0) {
+  const anthropicKey = getAnthropicKey();
+  const geminiKey = getGeminiKey();
+  const groqKey = getGroqKey();
+
+  // 1º Anthropic (si tiene key)
+  if (anthropicKey && retryCount === 0) {
+    try {
+      return await callAnthropic(b64, prompt, maxTokens, anthropicKey);
+    } catch(e) {
+      if (e.message.includes('429')) {
+        const wait = Math.pow(2, retryCount + 2) * 1000;
+        updateBtn(`⏳ Rate limit — esperando ${Math.round(wait/1000)}s...`);
+        await sleep(wait);
+        return callAPI(b64, prompt, maxTokens, retryCount + 1);
+      }
+      console.warn('Anthropic failed, trying next:', e.message);
+      // Caer al siguiente proveedor
+    }
+  }
+
+  // 2º Gemini
+  if (geminiKey) {
+    try {
+      return await callGemini(b64, prompt, geminiKey);
+    } catch(e) {
+      console.warn('Gemini failed, trying Groq:', e.message);
+      // Caer a Groq
+    }
+  }
+
+  // 3º Groq
+  if (groqKey) {
+    return await callGroq(b64, prompt, groqKey);
+  }
+
+  throw new Error('No hay API key configurada. Ve a Ajustes ⚙️ y añade tu Groq API key (gratuita en console.groq.com).');
+}
+
+async function callAnthropic(b64, prompt, maxTokens, apiKey) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
+        { type: 'text', text: prompt }
+      ]}]
+    })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const d = await res.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.content.map(c => c.text || '').join('');
+}
+
+async function callGemini(b64, prompt, apiKey) {
+  // Intentar primero con gemini-2.0-flash, luego fallback a 1.5-flash
+  const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  let lastErr;
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [
+              { inline_data: { mime_type: 'application/pdf', data: b64 } },
+              { text: prompt }
+            ]}],
+            generationConfig: { temperature: 0, maxOutputTokens: 8192 }
+          })
+        }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Gemini error (${model}): ${err.error?.message || res.status}`);
+      }
+      const d = await res.json();
+      const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error(`Gemini (${model}): respuesta vacía`);
+      return text;
+    } catch(e) {
+      lastErr = e;
+      console.warn(`Gemini ${model} failed:`, e.message);
+    }
+  }
+  throw lastErr;
+}
+
+// Convierte PDF base64 a array de imágenes JPEG base64 usando PDF.js
+async function pdfB64ToImages(b64) {
+  // Cargar PDF.js dinámicamente si no está disponible
+  if (!window.pdfjsLib) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = res;
+      s.onerror = () => rej(new Error('No se pudo cargar PDF.js'));
+      document.head.appendChild(s);
+    });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  const pdf = await window.pdfjsLib.getDocument({ data: bytes }).promise;
+  const images = [];
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 2.0 }); // escala 2x para mejor calidad OCR
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    // Convertir a JPEG base64 (sin el prefijo data:...)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    images.push(dataUrl.split(',')[1]);
+  }
+  return images;
+}
+
+async function callGroq(b64, prompt, apiKey) {
+  // Groq soporta imágenes (JPEG/PNG) pero NO PDFs directamente.
+  // Convertimos el PDF a imágenes página a página y las enviamos.
+  let images;
+  try {
+    images = await pdfB64ToImages(b64);
+  } catch(e) {
+    throw new Error(`Groq: no se pudo convertir el PDF a imágenes — ${e.message}`);
+  }
+
+  if (!images || images.length === 0) {
+    throw new Error('Groq: el PDF no generó ninguna imagen');
+  }
+
+  // Construir el contenido: todas las páginas como image_url + el prompt al final
+  const content = [
+    ...images.map(imgB64 => ({
+      type: 'image_url',
+      image_url: { url: `data:image/jpeg;base64,${imgB64}` }
+    })),
+    { type: 'text', text: prompt }
+  ];
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      max_tokens: 8192,
+      temperature: 0,
+      messages: [{ role: 'user', content }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Groq error: ${err.error?.message || res.status}`);
+  }
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+
+async function syncFromCloud() {
+  const cloudData = await cloudLoad();
+  if (cloudData) {
+    localStorage.setItem('iberia_v3', JSON.stringify(cloudData));
+    renderMonthPills();
+    renderIRPF();
+    renderGastos();
+  }
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sc-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'irpf') renderIRPF();
+  if (name === 'gastos') renderGastos();
+  if (name === 'nominas') renderMonthPills();
+  if (name === 'ajustes') renderSettingsScreen();
+}
+
+function changeMonth(d) {
+  nomMonth += d;
+  if (nomMonth < 0) { nomMonth = 11; nomYear--; }
+  if (nomMonth > 11) { nomMonth = 0; nomYear++; }
+  document.getElementById('nom-month-label').textContent = MONTHS[nomMonth] + ' ' + nomYear;
+  resetForm();
+  renderMonthPills();
+}
+function changeIRPFYear(d) {
+  irpfYear += d;
+  document.getElementById('irpf-year-label').textContent = irpfYear;
+  renderIRPF();
+}
+function changeGastoMonth(d) {
+  gastoMonth += d;
+  if (gastoMonth < 0) { gastoMonth = 11; gastoYear--; }
+  if (gastoMonth > 11) { gastoMonth = 0; gastoYear++; }
+  document.getElementById('gasto-month-label').textContent = MONTHS[gastoMonth] + ' ' + gastoYear;
+  renderGastoTab();
+}
+
+// ─── UPLOADS ──────────────────────────────────────────────────────────────
+function triggerUpload(t) { document.getElementById('file-' + t).click(); }
+
+function handleFile(t, inp) {
+  if (!inp.files[0]) return;
+  files[t] = inp.files[0];
+  const zone = document.getElementById('zone-' + t);
+  zone.classList.add('has-file');
+  zone.innerHTML = `<span class="uz-badge">✓ PDF cargado</span><span class="uz-icon">📄</span><div class="uz-title" style="color:var(--blue)">${inp.files[0].name}</div><div class="uz-sub">${(inp.files[0].size/1024).toFixed(0)} KB</div>`;
+  document.getElementById('btn-analyze-' + t).disabled = false;
+  // Clear previous results for this slot if re-uploading
+  extracted[t] = null;
+  document.getElementById('results-' + t).style.display = 'none';
+  document.getElementById('btn-save-' + t).style.display = 'none';
+}
+
+// ─── AI EXTRACTION ────────────────────────────────────────────────────────
+async function analyzeSlot(slot) {
+  const btn = document.getElementById('btn-analyze-' + slot);
+  const origLabel = slot === 'mensual' ? '🤖 Analizar nómina mensual' : '🤖 Analizar atrasos / extra';
+  btn.disabled = true;
+  window._activeSlot = slot;
+  try {
+    extracted[slot] = await extractPDFSmartBatch(files[slot], slot);
+    showSlotResults(slot);
+  } catch(e) {
+    alert('Error al analizar: ' + e.message);
+    console.error(e);
+  }
+  btn.innerHTML = origLabel;
+  btn.disabled = false;
+}
+
+function updateBtn(txt) {
+  const slot = window._activeSlot || 'mensual';
+  const btn = document.getElementById('btn-analyze-' + slot);
+  if (btn) btn.innerHTML = `<div class="spinner"></div> ${txt}`;
+}
+
+function showSlotResults(slot) {
+  const container = document.getElementById('results-' + slot);
+  container.style.display = 'block';
+  container.innerHTML = '';
+  const nominas = extracted[slot] || [];
+
+  nominas.forEach((nom, idx) => {
+    const typeClass = nom.tipo === 'Nómina Mensual' ? 'tipo-mensual' : nom.tipo === 'Extra' ? 'tipo-extra' : 'tipo-atrasos';
+    const subtipoTag = nom.subtipo === 'paga_extra'
+      ? `<span style="background:#f0e6ff;color:#5b21b6;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:4px">⭐ paga extra</span>` : '';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '8px';
+
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0"
+        onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.arr').style.transform=this.nextElementSibling.style.display==='block'?'rotate(90deg)':''">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="tipo-tag ${typeClass}">${nom.tipo==='Nómina Mensual'?'Mensual':nom.tipo==='Extra'?'Extra':'Atrasos'}</span>
+        ${subtipoTag}
+        <span style="font-size:14px;font-weight:500">${nom.periodo}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--blue)">${f2(nom.liquido||0)}</span>
+        <span class="arr" style="color:var(--sub);font-size:16px;transition:transform 0.2s">›</span>
+      </div>
+    </div>
+    <div style="display:none;margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px">`;
+
+    let lastSec = '';
+    FIELD_DEFS.forEach(fd => {
+      const val = nom[fd.k];
+      if ((val === 0 || val === undefined) && !['total_devengado','total_deducciones','liquido','base_irpf'].includes(fd.k)) return;
+      if (fd.sec !== lastSec) {
+        const labels = {devengos:'Devengos', deducciones:'Deducciones', totales:'Totales', irpf:'IRPF'};
+        html += `<div class="field-section">${labels[fd.sec]}</div>`;
+        lastSec = fd.sec;
+      }
+      const isTotal = ['total_devengado','total_deducciones','liquido'].includes(fd.k);
+      html += `<div class="field-row">
+        <span class="field-label" style="${isTotal?'font-weight:600':''}">${fd.l}</span>
+        <input class="field-input" type="number" step="0.01" value="${val||0}"
+          oninput="updateExtractedSlot('${slot}',${idx},'${fd.k}',this.value)" style="font-size:13px">
+      </div>`;
+    });
+    html += `</div>`;
+
+    // Coherence warning inline
+    const diff = Math.abs((nom.total_devengado||0) - (nom.total_deducciones||0) - (nom.liquido||0));
+    if (diff > 1) {
+      html += `<div class="alert alert-amber" style="font-size:12px;margin-top:8px">
+        ⚠️ Devengados − Deducciones ≠ Líquido (diferencia ${f2(diff)}). Revisa los valores.
+      </div>`;
+    }
+
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+
+  document.getElementById('btn-save-' + slot).style.display = 'block';
+}
+
+function updateExtractedSlot(slot, idx, key, val) {
+  if (extracted[slot] && extracted[slot][idx]) {
+    extracted[slot][idx][key] = parseFloat(val) || 0;
+  }
+}
+
+function saveSlot(slot) {
+  const state = loadState();
+  const key = `${nomYear}-${String(nomMonth + 1).padStart(2,'0')}`;
+  const nominas = extracted[slot] || [];
+  if (!state.months[key]) state.months[key] = [];
+
+  let added = 0, updated = 0;
+  nominas.forEach(n => {
+    // Clave única: periodo + tipo + líquido redondeado a 2 decimales
+    // El líquido identifica inequívocamente cada documento aunque coincidan periodo y tipo
+    const liqKey = Math.round((n.liquido || 0) * 100); // evita problemas de float
+    const dupKey = `${n.periodo}||${n.tipo}||${liqKey}`;
+
+    const exists = state.months[key].findIndex(x => {
+      const xLiqKey = Math.round((x.liquido || 0) * 100);
+      return `${x.periodo}||${x.tipo}||${xLiqKey}` === dupKey;
+    });
+
+    if (exists >= 0) {
+      state.months[key][exists] = n; // actualizar si mismo líquido exacto
+      updated++;
+    } else {
+      state.months[key].push(n); // siempre añadir si líquido distinto
+      added++;
+    }
+  });
+
+  saveState(state);
+  renderMonthPills();
+  showVerifyPanel(key, state.months[key]);
+  resetSlot(slot);
+
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#166534;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+  toast.textContent = `✓ ${added} añadido(s)${updated ? ', ' + updated + ' actualizado(s)' : ''}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function resetSlot(slot) {
+  files[slot] = null;
+  extracted[slot] = null;
+  const zone = document.getElementById('zone-' + slot);
+  zone.classList.remove('has-file');
+  zone.innerHTML = slot === 'mensual'
+    ? '<span class="uz-icon">📋</span><div class="uz-title">Toca para subir el PDF</div><div class="uz-sub">Nómina regular del mes</div>'
+    : '<span class="uz-icon">📂</span><div class="uz-title">Toca para subir PDF adicional</div><div class="uz-sub">Atrasos, paga extra, complementos...</div>';
+  document.getElementById('file-' + slot).value = '';
+  document.getElementById('btn-analyze-' + slot).disabled = true;
+  document.getElementById('results-' + slot).style.display = 'none';
+  document.getElementById('btn-save-' + slot).style.display = 'none';
+}
+
+function resetForm() {
+  resetSlot('mensual');
+  resetSlot('extra');
+}
+
+// ─── EXTRACCIÓN POR LOTES INTELIGENTE ────────────────────────────────────────
+// Paso 1: Reconocer cuántos documentos tiene el PDF y sus períodos
+// Paso 2: Extraer cada documento individualmente citando los valores exactos del PDF
+async function extractPDFSmartBatch(file, slot) {
+  const b64 = await fileToB64(file);
+
+  // PASO 1: Reconocimiento rápido de la estructura del PDF
+  updateBtn('📋 Identificando documentos...');
+  const structurePrompt = `Eres un experto en nóminas de Iberia LAE. Analiza TODAS las páginas de este PDF sin saltarte ninguna.
+
+REGLA CRÍTICA — ATRASOS DOBLES EN IBERIA:
+En los meses de JULIO y DICIEMBRE (meses de paga extra), Iberia genera DOS documentos de atrasos separados para el mismo mes:
+  Documento A — Atraso normal: tiene IB021 Prima Razón Viaje, IB056 Indem.Renuncia, IB132 Dietas Exceso Topes, IB138, IB347. Suele tener un líquido más alto.
+  Documento B — Atraso paga extra: tiene SOLO IB001 Sueldo Base + IB010 + IB017 + IB021 Imp.Teór IB021 Garant P + IB033A. SIN dietas. Suele tener un líquido más bajo (ej: 55,99€ o 76,48€).
+Ejemplo real: Julio 2025 tiene DOS páginas de atrasos con líquidos 156,62€ y 55,99€ — son dos documentos distintos.
+
+INSTRUCCIÓN: Cuenta el número EXACTO de páginas de nómina en este PDF localizando cada "LIQUIDO TOTAL A PERCIBIR" — cada uno es un documento distinto.
+
+Para CADA documento devuelve:
+- periodo: "Mes Año" (ej: "Julio 2025")
+- tipo: "Nómina Mensual", "Atrasos" o "Extra"
+- subtipo: "paga_extra" si solo tiene IB001+IB010+IB017+IB021Imp.Teór+IB033A sin dietas; "normal" en cualquier otro caso
+- liquido: el número exacto de "LIQUIDO TOTAL A PERCIBIR" de ese documento (usa el número completo con decimales)
+
+Devuelve SOLO el JSON array ordenado como aparece en el PDF, sin texto ni backticks:
+[{"periodo":"...","tipo":"...","subtipo":"normal","liquido":156.62}, ...]`;
+
+  const structRes = await callAPI(b64, structurePrompt, 4000);
+  let structure;
+  try {
+    structure = JSON.parse(cleanJSON(structRes));
+  } catch(e) {
+    updateBtn('📄 Extrayendo datos completos...');
+    return await extractPDFFull(b64);
+  }
+
+  if (!Array.isArray(structure) || structure.length === 0) {
+    return await extractPDFFull(b64);
+  }
+
+  // Validación: eliminar duplicados exactos (mismo periodo+tipo+liquido exacto)
+  // pero MANTENER entradas con mismo periodo+tipo y líquido diferente (son documentos distintos)
+  const seen = new Set();
+  structure = structure.filter(doc => {
+    const k = `${doc.periodo}||${doc.tipo}||${Math.round((doc.liquido||0)*100)}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  // PASO 2: Estrategia según tamaño
+  // PDFs pequeños (≤4 docs): una llamada por documento — máxima precisión
+  // PDFs grandes (>4 docs): lotes de 3 — equilibrio precisión/velocidad/rate-limit
+  const results = [];
+  const BATCH_SIZE = structure.length > 4 ? 3 : 1;
+
+  for (let i = 0; i < structure.length; i += BATCH_SIZE) {
+    const batch = structure.slice(i, i + BATCH_SIZE);
+
+    if (BATCH_SIZE === 1) {
+      const doc = batch[0];
+      updateBtn(`📊 Extrayendo ${i+1}/${structure.length}: ${doc.periodo}${doc.subtipo==='paga_extra'?' ⭐':''}...`);
+      const docData = await extractSingleDocument(b64, doc, i, structure.length);
+      if (docData) results.push(docData);
+    } else {
+      updateBtn(`📊 Extrayendo docs ${i+1}–${Math.min(i+BATCH_SIZE, structure.length)} de ${structure.length}...`);
+      const batchData = await extractBatch(b64, batch, i, structure.length);
+      batchData.forEach(d => { if(d) results.push(d); });
+    }
+
+    if (i + BATCH_SIZE < structure.length) await sleep(2500);
+  }
+
+  return results.length > 0 ? results : await extractPDFFull(b64);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function extractSingleDocument(b64, doc, idx, total) {
+  const esPagaExtra = doc.subtipo === 'paga_extra';
+  const liquidoRef = doc.liquido ? `El líquido de este documento es aproximadamente ${doc.liquido} €.` : '';
+  
+  // Construir descripción del subtipo para localización precisa
+  const subtipoDesc = esPagaExtra
+    ? `Es un atraso de PAGA EXTRA (solo contiene IB001 Sueldo Base + IB010 Complemento Transitorio + IB017 Prima Copiloto + IB021 Imp.Teór Garant + IB033A Prima Productividad — SIN dietas IB032/IB132 ni IB056/IB138/IB347).`
+    : `Es un atraso NORMAL (contiene conceptos variables: IB021 razón viaje, IB032 dietas vuelo, IB132 exceso topes, IB056, IB138, IB347, etc.).`;
+
+  const prompt = `Eres un auditor experto en nóminas de Iberia.
+
+TAREA: En este PDF con ${total} documentos, extrae el documento número ${idx+1}.
+Período: "${doc.periodo}" | Tipo: "${doc.tipo}"
+${doc.tipo === 'Atrasos' ? subtipoDesc : ''}
+${liquidoRef}
+
+LOCALIZACIÓN EXACTA:
+- ${doc.liquido ? `⭐ CLAVE: Busca el documento cuyo "LIQUIDO TOTAL A PERCIBIR" sea exactamente ${doc.liquido} € — este es el identificador más fiable` : `Busca "Periodo de liquidación:" que incluya "${doc.periodo}"`}
+- Tipo de paga: ${doc.tipo === 'Nómina Mensual' ? 'Nómina Mensual' : doc.tipo === 'Extra' ? 'Extra' : 'Atrasos'}
+- ${esPagaExtra ? 'Contiene SOLO: IB001, IB010, IB017, IB021 Imp.Teór, IB033A — sin IB032 ni IB132 ni IB056' : 'Puede contener IB032, IB132, IB021 razón viaje, IB056, IB138, IB347'}
+- Es el documento número ${idx+1} de ${total} en el PDF
+
+NORMAS DE LECTURA:
+1. Copia los números EXACTAMENTE como aparecen — no calcules ni estimes
+2. TOTAL DEVENGADO - TOTAL A DEDUCIR = LIQUIDO (verifica antes de responder)
+3. base_irpf = el número que aparece junto al % en la línea de retención: "26,65% [BASE]" → ese número
+4. cuota_ss = CC_trabajador + Desempleo_trabajador + FP_trabajador + MEI_trabajador (NO los de empresa)
+5. Si un concepto no está en este documento → 0
+
+Devuelve SOLO este JSON sin backticks ni texto:
+{
+  "periodo": "${doc.periodo}",
+  "tipo": "${doc.tipo}",
+  "subtipo": "${doc.subtipo || 'normal'}",
+  "sueldo_base": 0,
+  "complemento_transitorio": 0,
+  "prima_copiloto": 0,
+  "prima_productividad": 0,
+  "prima_razon_vuelo": 0,
+  "pago_unico": 0,
+  "dieta_desplazamiento": 0,
+  "dietas_exceso_topes": 0,
+  "otros_devengos": 0,
+  "total_devengado": 0,
+  "retencion_irpf": 0,
+  "ingreso_cuenta_irpf": 0,
+  "cuota_ss": 0,
+  "prestamo_ib": 0,
+  "otras_deducciones": 0,
+  "total_deducciones": 0,
+  "liquido": 0,
+  "base_irpf": 0,
+  "pct_irpf": 0
+}`;
+
+  try {
+    const txt = await callAPI(b64, prompt, 1000);
+    const parsed = JSON.parse(cleanJSON(txt));
+    if (!parsed.total_devengado && !parsed.liquido) return null;
+    // Validate basic coherence: devengado - deducciones ≈ liquido (allow 1€ rounding)
+    const diff = Math.abs((parsed.total_devengado - parsed.total_deducciones) - parsed.liquido);
+    if (diff > 2) {
+      console.warn(`Doc ${idx+1} ${doc.periodo}: check totals — devengado(${parsed.total_devengado}) - deducciones(${parsed.total_deducciones}) ≠ liquido(${parsed.liquido}), diff=${diff}`);
+    }
+    return parsed;
+  } catch(e) {
+    console.warn('Error extracting doc', idx, doc.periodo, e);
+    return null;
+  }
+}
+
+// Extrae un lote de hasta 3 documentos en una sola llamada API
+async function extractBatch(b64, docs, startIdx, total) {
+  const docsDesc = docs.map((doc, i) => {
+    const n = startIdx + i + 1;
+    const esPagaExtra = doc.subtipo === 'paga_extra';
+    const subtipoDesc = doc.tipo === 'Atrasos'
+      ? (esPagaExtra
+          ? `Atraso PAGA EXTRA (solo IB001+IB010+IB017+IB021Imp.Teór+IB033A, sin dietas)`
+          : `Atraso NORMAL (con IB021 razón viaje, IB032/IB132 dietas, IB056/IB138/IB347)`)
+      : doc.tipo;
+    return `Doc ${n}: "${doc.periodo}" | ${subtipoDesc}${doc.liquido ? ` | Líquido≈${doc.liquido}€` : ''}`;
+  }).join('\n');
+
+  const prompt = `Eres un auditor experto en nóminas de Iberia. Este PDF tiene ${total} documentos en total.
+
+Extrae los siguientes ${docs.length} documentos (en orden de aparición en el PDF):
+${docsDesc}
+
+Para CADA documento devuelve un objeto JSON con sus datos exactos leídos del PDF.
+NORMAS ESTRICTAS:
+- Copia los números exactamente — NO calcules
+- base_irpf = número junto al % en la línea de retención ("26,65% [BASE]" → BASE)  
+- cuota_ss = CC + Desempleo + FP + MEI del TRABAJADOR solamente
+- IB032 = dieta_desplazamiento (exenta), IB132 = dietas_exceso_topes (tributa)
+- prestamo_ib = IB221 únicamente
+- otros_devengos = IB056 + IB138 + IB347 + resto
+- Si un concepto no aparece → 0
+- VERIFICA: total_devengado - total_deducciones = liquido
+
+Devuelve un JSON array con EXACTAMENTE ${docs.length} objetos en el mismo orden:
+[
+  ${docs.map(doc => `{
+    "periodo":"${doc.periodo}","tipo":"${doc.tipo}","subtipo":"${doc.subtipo||'normal'}",
+    "sueldo_base":0,"complemento_transitorio":0,"prima_copiloto":0,"prima_productividad":0,
+    "prima_razon_vuelo":0,"pago_unico":0,"dieta_desplazamiento":0,"dietas_exceso_topes":0,
+    "otros_devengos":0,"total_devengado":0,"retencion_irpf":0,"ingreso_cuenta_irpf":0,
+    "cuota_ss":0,"prestamo_ib":0,"otras_deducciones":0,"total_deducciones":0,
+    "liquido":0,"base_irpf":0,"pct_irpf":0
+  }`).join(',\n  ')}
+]
+
+Sin backticks, sin texto adicional.`;
+
+  try {
+    const txt = await callAPI(b64, prompt, 2500);
+    const parsed = JSON.parse(cleanJSON(txt));
+    const arr = Array.isArray(parsed) ? parsed : [parsed];
+    return arr.map((item, i) => {
+      if (!item || (!item.total_devengado && !item.liquido)) return null;
+      // Ensure periodo/tipo/subtipo are correct
+      if (docs[i]) {
+        item.periodo = item.periodo || docs[i].periodo;
+        item.tipo = item.tipo || docs[i].tipo;
+        item.subtipo = item.subtipo || docs[i].subtipo || 'normal';
+      }
+      return item;
+    });
+  } catch(e) {
+    console.warn('Batch extraction failed, trying individual:', e.message);
+    // Fallback: intentar uno a uno
+    const results = [];
+    for (let j = 0; j < docs.length; j++) {
+      await sleep(2000);
+      const d = await extractSingleDocument(b64, docs[j], startIdx + j, total);
+      results.push(d);
+    }
+    return results;
+  }
+}
+async function extractPDFFull(b64) {
+  const prompt = `Eres un experto en nóminas de Iberia. Extrae TODAS las nóminas de este PDF.
+
+ATENCIÓN — CASO ESPECIAL IBERIA:
+En atrasos, puede haber DOS documentos para el mismo mes:
+1. Atraso NORMAL: tiene IB021 razón viaje + IB032 dieta + IB132 exceso topes + IB056 + IB138/IB347
+2. Atraso PAGA EXTRA: solo tiene IB001+IB010+IB017+IB021 Imp.Teór+IB033A (sin dietas)
+Son documentos SEPARADOS — inclúyelos como dos entradas distintas en el array.
+
+REGLAS DE PRECISIÓN ABSOLUTA:
+- Copia cada número exactamente como aparece — NO calcules
+- base_irpf = número que aparece junto al % en la línea de retención
+- cuota_ss = CC + Desempleo + FP + MEI del TRABAJADOR (no empresa)
+- IB032 = dieta_desplazamiento (EXENTA), IB132 = dietas_exceso_topes (TRIBUTA)
+- prestamo_ib = IB221 únicamente
+- otros_devengos = IB056 + IB138 + IB347 + resto no listado
+- subtipo: "normal" para atrasos con dietas, "paga_extra" para atrasos solo con sueldo+complementos
+
+Responde SOLO con JSON array:
+[{
+  "periodo":"Mes Año","tipo":"Nómina Mensual|Atrasos|Extra","subtipo":"normal|paga_extra",
+  "sueldo_base":0,"complemento_transitorio":0,"prima_copiloto":0,"prima_productividad":0,
+  "prima_razon_vuelo":0,"pago_unico":0,"dieta_desplazamiento":0,"dietas_exceso_topes":0,
+  "otros_devengos":0,"total_devengado":0,"retencion_irpf":0,"ingreso_cuenta_irpf":0,
+  "cuota_ss":0,"prestamo_ib":0,"otras_deducciones":0,"total_deducciones":0,
+  "liquido":0,"base_irpf":0,"pct_irpf":0
+}]`;
+
+  const txt = await callAPI(b64, prompt, 16000);
+  const parsed = JSON.parse(cleanJSON(txt));
+  return Array.isArray(parsed) ? parsed : [parsed];
+}
+
+
+function cleanJSON(txt) {
+  let clean = txt.replace(/```json|```/g,'').trim();
+  // Extract first JSON object or array
+  const arrMatch = clean.match(/\[[\s\S]*\]/);
+  const objMatch = clean.match(/\{[\s\S]*\}/);
+  if (arrMatch) return arrMatch[0];
+  if (objMatch) return objMatch[0];
+  return clean;
+}
+
+function fileToB64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Error leyendo archivo'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ─── RESULTS DISPLAY ──────────────────────────────────────────────────────
+const FIELD_DEFS = [
+  {k:'sueldo_base', l:'Sueldo base (IB001)', sec:'devengos'},
+  {k:'complemento_transitorio', l:'Complemento transitorio (IB010)', sec:'devengos'},
+  {k:'prima_copiloto', l:'Prima copiloto (IB017)', sec:'devengos'},
+  {k:'prima_productividad', l:'Prima productividad vuelo (IB033A)', sec:'devengos'},
+  {k:'prima_razon_vuelo', l:'Prima razón vuelo (IB021)', sec:'devengos'},
+  {k:'pago_unico', l:'Pago único (IB075)', sec:'devengos'},
+  {k:'dieta_desplazamiento', l:'🟢 Dieta desplaz. vuelo (IB032) — Exento IRPF', sec:'devengos'},
+  {k:'dietas_exceso_topes', l:'🔴 Dietas exceso topes (IB132) — Tributa IRPF', sec:'devengos'},
+  {k:'otros_devengos', l:'Otros devengos', sec:'devengos'},
+  {k:'total_devengado', l:'TOTAL DEVENGADO', sec:'totales'},
+  {k:'retencion_irpf', l:'Retención IRPF', sec:'deducciones'},
+  {k:'ingreso_cuenta_irpf', l:'Ingreso a cuenta (billetes)', sec:'deducciones'},
+  {k:'cuota_ss', l:'Cuota SS (CC+desempleo+FP+MEI)', sec:'deducciones'},
+  {k:'prestamo_ib', l:'Préstamo Iberia (IB221)', sec:'deducciones'},
+  {k:'otras_deducciones', l:'Otras deducciones', sec:'deducciones'},
+  {k:'total_deducciones', l:'TOTAL DEDUCCIONES', sec:'totales'},
+  {k:'liquido', l:'LÍQUIDO A PERCIBIR', sec:'totales'},
+  {k:'base_irpf', l:'Base IRPF', sec:'irpf'},
+  {k:'pct_irpf', l:'% IRPF aplicado', sec:'irpf'},
+];
+
+function renderMonthPills() {
+  const state = loadState();
+  const el = document.getElementById('months-pills');
+  if (!el) return;
+  const year = nomYear;
+  const pills = MSHORT.map((m, i) => {
+    const key = `${year}-${String(i+1).padStart(2,'0')}`;
+    const entries = state.months[key] || [];
+    const hasData = entries.length > 0;
+    const active = i === nomMonth;
+    const count = hasData ? `<span style="background:#fff;color:#185FA5;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;margin-left:3px">${entries.length}</span>` : '';
+    return `<span class="m-pill${hasData?' has-data':''}${active?' has-data':''}" onclick="jumpToMonth(${i})">${MSHORT[i]}${count}</span>`;
+  });
+  el.innerHTML = pills.join('');
+}
+
+function jumpToMonth(m) {
+  nomMonth = m;
+  document.getElementById('nom-month-label').textContent = MONTHS[nomMonth] + ' ' + nomYear;
+  resetForm();
+  renderMonthPills();
+  // Show saved data if exists
+  const state = loadState();
+  const key = `${nomYear}-${String(nomMonth+1).padStart(2,'0')}`;
+  if (state.months[key] && state.months[key].length > 0) {
+    showVerifyPanel(key, state.months[key]);
+  }
+}
+
+function showVerifyPanel(key, entries) {
+  const panel = document.getElementById('verify-panel');
+  const title = document.getElementById('verify-title');
+  const container = document.getElementById('verify-entries');
+  title.textContent = `${MONTHS[nomMonth]} ${nomYear} · ${entries.length} documento(s) guardado(s)`;
+  panel.style.display = 'block';
+  panel.dataset.key = key;
+  container.innerHTML = '';
+
+  // Summary bar
+  let totalBruto=0, totalIrpf=0, totalLiq=0;
+  entries.forEach(e => { totalBruto+=(e.base_irpf||0); totalIrpf+=(e.retencion_irpf||0)+(e.ingreso_cuenta_irpf||0); totalLiq+=(e.liquido||0); });
+  const summaryBar = document.createElement('div');
+  summaryBar.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px';
+  summaryBar.innerHTML = `
+    <div style="background:#dbeafe;border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:#1e40af;font-weight:600">BASE IRPF</div>
+      <div style="font-size:14px;font-weight:800;color:#1e40af">${f2k(totalBruto)}</div>
+    </div>
+    <div style="background:#fee2e2;border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:#991b1b;font-weight:600">IRPF RET.</div>
+      <div style="font-size:14px;font-weight:800;color:#991b1b">${f2k(totalIrpf)}</div>
+    </div>
+    <div style="background:#dcfce7;border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:#166534;font-weight:600">LÍQUIDO</div>
+      <div style="font-size:14px;font-weight:800;color:#166534">${f2k(totalLiq)}</div>
+    </div>`;
+  container.appendChild(summaryBar);
+
+  // Per-entry accordion
+  entries.forEach((entry, idx) => {
+    const typeClass = entry.tipo==='Nómina Mensual'?'tipo-mensual':entry.tipo==='Extra'?'tipo-extra':'tipo-atrasos';
+    const subtipoTag = entry.subtipo==='paga_extra'
+      ? `<span style="background:#f0e6ff;color:#5b21b6;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:4px">⭐ paga extra</span>`
+      : '';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card);border:0.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="tipo-tag ${typeClass}">${entry.tipo==='Nómina Mensual'?'Mensual':entry.tipo==='Extra'?'Extra':'Atrasos'}</span>
+        ${subtipoTag}
+        <span style="font-size:14px;font-weight:500;color:var(--text)">${entry.periodo}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--blue)">${f2(entry.liquido||0)}</span>
+        <span id="arr-${idx}" style="color:var(--sub);font-size:16px;transition:transform 0.2s">›</span>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.id = `body-${idx}`;
+    body.style.cssText = 'display:none;padding:0 14px 12px;border-top:0.5px solid var(--border)';
+
+    const fields = [
+      {l:'Sueldo base (IB001)', v: entry.sueldo_base, cat:'dev'},
+      {l:'Prima copiloto (IB017)', v: entry.prima_copiloto, cat:'dev'},
+      {l:'Prima productividad (IB033A)', v: entry.prima_productividad, cat:'dev'},
+      {l:'Prima razón vuelo (IB021)', v: entry.prima_razon_vuelo, cat:'dev'},
+      {l:'Pago único (IB075)', v: entry.pago_unico, cat:'dev'},
+      {l:'🟢 Dieta IB032 (EXENTA)', v: entry.dieta_desplazamiento, cat:'exento'},
+      {l:'🔴 Dieta IB132 (TRIBUTA)', v: entry.dietas_exceso_topes, cat:'tributa'},
+      {l:'Otros devengos', v: entry.otros_devengos, cat:'dev'},
+      {l:'TOTAL DEVENGADO', v: entry.total_devengado, cat:'total'},
+      {l:'Retención IRPF', v: entry.retencion_irpf, cat:'ded'},
+      {l:'Ingreso a cuenta (billetes)', v: entry.ingreso_cuenta_irpf, cat:'ded'},
+      {l:'Cuotas SS', v: entry.cuota_ss, cat:'ded'},
+      {l:'Préstamo Iberia (IB221)', v: entry.prestamo_ib, cat:'ded'},
+      {l:'Otras deducciones', v: entry.otras_deducciones, cat:'ded'},
+      {l:'TOTAL A DEDUCIR', v: entry.total_deducciones, cat:'total'},
+      {l:'LÍQUIDO A PERCIBIR', v: entry.liquido, cat:'total'},
+      {l:'Base IRPF', v: entry.base_irpf, cat:'meta'},
+      {l:'% IRPF aplicado', v: entry.pct_irpf, cat:'meta', suffix:'%'},
+    ];
+
+    const catColors = {dev:'var(--text)',exento:'#166534',tributa:'#991b1b',ded:'#7c3aed',total:'#185FA5',meta:'var(--sub)'};
+    const catBg = {dev:'transparent',exento:'#f0fdf4',tributa:'#fef2f2',ded:'transparent',total:'#eff6ff',meta:'var(--bg)'};
+
+    body.innerHTML = fields.filter(f => f.v !== 0 && f.v !== undefined).map(f => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);background:${catBg[f.cat]}">
+        <span style="font-size:12px;color:${catColors[f.cat]};${f.cat==='total'?'font-weight:600':''};padding-left:${f.cat==='total'?'0':'0'}px">${f.l}</span>
+        <span style="font-size:13px;font-weight:${f.cat==='total'?'700':'500'};color:${catColors[f.cat]}">${f.suffix?f.v+f.suffix:f2(f.v)}</span>
+      </div>`).join('');
+
+    // Edit button in body
+    body.innerHTML += `<div style="display:flex;gap:6px;margin-top:10px">
+      <button onclick="editEntry(${idx})" style="flex:1;padding:8px;border-radius:8px;background:#e0e7ff;color:#3730a3;border:none;font-size:12px;font-weight:600;cursor:pointer">✏️ Editar valores</button>
+      <button onclick="deleteEntry(${idx})" style="padding:8px 12px;border-radius:8px;background:#fee2e2;color:#991b1b;border:none;font-size:12px;font-weight:600;cursor:pointer">🗑</button>
+    </div>`;
+
+    header.onclick = () => {
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      document.getElementById(`arr-${idx}`).style.transform = isOpen ? '' : 'rotate(90deg)';
+    };
+
+    card.appendChild(header);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+
+function closeVerify() {
+  document.getElementById('verify-panel').style.display = 'none';
+}
+
+function deleteMonthData() {
+  // No usar confirm() — está bloqueado en Safari iOS standalone y algunos iframes
+  const panel = document.getElementById('verify-panel');
+  const key = panel.dataset.key || `${nomYear}-${String(nomMonth+1).padStart(2,'0')}`;
+  const label = MONTHS[nomMonth] + ' ' + nomYear;
+
+  // Crear diálogo inline
+  const existing = document.getElementById('delete-confirm-dialog');
+  if (existing) existing.remove();
+
+  const dlg = document.createElement('div');
+  dlg.id = 'delete-confirm-dialog';
+  dlg.style.cssText = `
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.5);z-index:9999;
+    display:flex;align-items:center;justify-content:center;padding:20px`;
+  dlg.innerHTML = `
+    <div style="background:var(--card);border-radius:16px;padding:24px;max-width:320px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+      <div style="font-size:32px;text-align:center;margin-bottom:12px">🗑️</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);text-align:center;margin-bottom:8px">Borrar ${label}</div>
+      <div style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:20px;line-height:1.5">Se eliminarán todos los documentos guardados de este mes. Esta acción no se puede deshacer.</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('delete-confirm-dialog').remove()"
+          style="flex:1;padding:12px;border-radius:10px;background:var(--bg);border:0.5px solid var(--border);color:var(--text);font-size:15px;font-weight:500;cursor:pointer">
+          Cancelar
+        </button>
+        <button onclick="confirmDeleteMonth('${key}')"
+          style="flex:1;padding:12px;border-radius:10px;background:#dc2626;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer">
+          Borrar
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(dlg);
+  // Cerrar al tocar el fondo
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.remove(); });
+}
+
+function confirmDeleteMonth(key) {
+  document.getElementById('delete-confirm-dialog')?.remove();
+  const state = loadState();
+  delete state.months[key];
+  saveState(state);
+  document.getElementById('verify-panel').style.display = 'none';
+  renderMonthPills();
+
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#7f1d1d;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+  toast.textContent = '🗑 Mes eliminado';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function deleteEntry(idx) {
+  const panel = document.getElementById('verify-panel');
+  const key = panel.dataset.key || `${nomYear}-${String(nomMonth+1).padStart(2,'0')}`;
+  const state = loadState();
+  if (!state.months[key]) return;
+
+  state.months[key].splice(idx, 1);
+  if (state.months[key].length === 0) delete state.months[key];
+  saveState(state);
+  renderMonthPills();
+
+  const entries = state.months[key];
+  if (entries && entries.length > 0) showVerifyPanel(key, entries);
+  else document.getElementById('verify-panel').style.display = 'none';
+
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#7f1d1d;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+  toast.textContent = '🗑 Documento eliminado';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function editEntry(idx) {
+  const state = loadState();
+  const key = `${nomYear}-${String(nomMonth+1).padStart(2,'0')}`;
+  const entry = state.months[key][idx];
+  // Put in mensual slot for editing
+  extracted.mensual = [entry];
+  extracted.extra = null;
+  document.getElementById('verify-panel').style.display = 'none';
+  showSlotResults('mensual');
+  document.getElementById('results-mensual').scrollIntoView({behavior:'smooth'});
+}
+
+
+// ─── IRPF ─────────────────────────────────────────────────────────────────
+function renderIRPF() {
+  const state = loadState();
+  const tbody = document.getElementById('irpf-tbody');
+  let rows = [], sbTotal = 0, retTotal = 0, liqTotal = 0, dietaTotal = 0, excesoTotal = 0;
+  const totales = {};
+
+  for (let m = 0; m < 12; m++) {
+    const key = `${irpfYear}-${String(m+1).padStart(2,'0')}`;
+    const entries = state.months[key] || [];
+    entries.forEach(nom => {
+      const sb = nom.base_irpf || 0;
+      const ret = (nom.retencion_irpf || 0) + (nom.ingreso_cuenta_irpf || 0);
+      const liq = nom.liquido || 0;
+      const pct = sb > 0 ? ((ret / sb) * 100).toFixed(1) : '—';
+      sbTotal += sb; retTotal += ret; liqTotal += liq;
+      dietaTotal += nom.dieta_desplazamiento || 0;
+      excesoTotal += nom.dietas_exceso_topes || 0;
+      FIELD_DEFS.forEach(fd => {
+        if (!totales[fd.k]) totales[fd.k] = 0;
+        totales[fd.k] += nom[fd.k] || 0;
+      });
+      const typeClass = nom.tipo === 'Nómina Mensual' ? 'tipo-mensual' : nom.tipo === 'Extra' ? 'tipo-extra' : 'tipo-atrasos';
+      rows.push(`<tr>
+        <td>${MSHORT[m]}</td>
+        <td><span class="tipo-tag ${typeClass}" style="font-size:9px">${nom.tipo==='Nómina Mensual'?'Mens.':nom.tipo==='Atrasos'?'Atr.':'Extra'}</span></td>
+        <td class="num">${f2(sb)}</td>
+        <td class="num">${f2(ret)}</td>
+        <td class="num">${pct}%</td>
+        <td class="num">${f2(liq)}</td>
+      </tr>`);
+    });
+  }
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--sub);font-size:13px">Sube nóminas para ver datos</td></tr>';
+  } else {
+    tbody.innerHTML = rows.join('') + `<tr class="total-row">
+      <td colspan="2">Total ${irpfYear}</td>
+      <td class="num">${f2(sbTotal)}</td>
+      <td class="num">${f2(retTotal)}</td>
+      <td class="num">${sbTotal > 0 ? ((retTotal/sbTotal)*100).toFixed(1) : '—'}%</td>
+      <td class="num">${f2(liqTotal)}</td>
+    </tr>`;
+  }
+
+  document.getElementById('irpf-base').textContent = f2(sbTotal);
+  document.getElementById('irpf-ret').textContent = f2(retTotal);
+  const pctMed = sbTotal > 0 ? (retTotal/sbTotal*100) : 0;
+  const pctEl = document.getElementById('irpf-pct');
+  pctEl.textContent = pctMed.toFixed(1) + '%';
+  pctEl.className = 'metric-val ' + (pctMed < 20 ? 'amber' : pctMed > 30 ? 'green' : 'blue');
+  document.getElementById('irpf-liq').textContent = f2(liqTotal);
+  document.getElementById('irpf-dietas').textContent = f2(dietaTotal);
+
+  const alertEl = document.getElementById('irpf-alert');
+  if (rows.length > 0) {
+    if (pctMed < 18) alertEl.innerHTML = `<div class="alert alert-amber">⚠️ Retención media baja (${pctMed.toFixed(1)}%). Podrías tener que pagar a Hacienda en la declaración.</div>`;
+    else if (pctMed > 28) alertEl.innerHTML = `<div class="alert alert-green">✅ Retención alta (${pctMed.toFixed(1)}%). Probable devolución en renta.</div>`;
+    else alertEl.innerHTML = `<div class="alert alert-blue">ℹ️ Retención en rango normal (${pctMed.toFixed(1)}%).</div>`;
+  } else alertEl.innerHTML = '';
+
+  // Totales por concepto
+  const totalsEl = document.getElementById('irpf-totals');
+  const toShow = ['sueldo_base','prima_copiloto','prima_razon_vuelo','prima_productividad','pago_unico','dieta_desplazamiento','dietas_exceso_topes','retencion_irpf','cuota_ss','liquido'];
+  const labels = {
+    sueldo_base:'Sueldo base',prima_copiloto:'Prima copiloto',prima_razon_vuelo:'Prima razón vuelo',
+    prima_productividad:'Prima productividad',pago_unico:'Pagos únicos',
+    dieta_desplazamiento:'🟢 Dieta desplaz. vuelo IB032 (exento IRPF)',dietas_exceso_topes:'🔴 Dietas exceso topes IB132 (tributa IRPF)',
+    retencion_irpf:'Retenciones IRPF',cuota_ss:'Cuotas SS',liquido:'Líquido total percibido'
+  };
+  totalsEl.innerHTML = toShow.filter(k => (totales[k]||0) > 0).map(k => `
+    <div class="field-row">
+      <span class="field-label">${labels[k]}</span>
+      <span class="field-val">${f2(totales[k]||0)}</span>
+    </div>`).join('');
+}
+
+// ─── GASTOS ───────────────────────────────────────────────────────────────
+function switchGastoTab(tab) {
+  ['gastos','balance','objetivos'].forEach(t => {
+    document.getElementById('gtab-' + t).style.display = t === tab ? 'block' : 'none';
+    document.querySelectorAll('.tab')[['gastos','balance','objetivos'].indexOf(t)].classList.toggle('active', t === tab);
+  });
+  if (tab === 'balance') renderBalance();
+  if (tab === 'objetivos') { renderObjetivos(); calcInversion(); }
+}
+
+function gKey() { return `${gastoYear}-${String(gastoMonth+1).padStart(2,'0')}`; }
+
+function renderGastos() {
+  document.getElementById('gasto-month-label').textContent = MONTHS[gastoMonth] + ' ' + gastoYear;
+  const state = loadState();
+  const gm = state.gastoMeta[gKey()] || {};
+  document.getElementById('ing-salario').value = gm.salario || '';
+  document.getElementById('ing-otros').value = gm.otros || '';
+  renderGastoTab();
+}
+
+function renderGastoTab() {
+  const state = loadState();
+  const gm = state.gastoMeta[gKey()] || {};
+  const totalIng = (parseFloat(document.getElementById('ing-salario').value)||0) + (parseFloat(document.getElementById('ing-otros').value)||0);
+  document.getElementById('ing-total').textContent = f2(totalIng);
+
+  let totalFijos=0, totalVariables=0, totalAnuales=0;
+
+  function buildCatCard(cat, i) {
+    const amount = gm['cat_' + cat.name] || 0;
+    const pct = totalIng > 0 ? Math.round((amount / totalIng) * 100) : 0;
+    const color = cat.color || CAT_COLORS[i % CAT_COLORS.length];
+    const emoji = cat.emoji || CAT_EMOJIS[cat.name] || '💰';
+    const isAnual = cat.tipo === 'anual';
+    const displayAmount = isAnual ? (cat.anual||0)/12 : amount;
+
+    const div = document.createElement('div');
+    div.style.cssText = `display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:5px;border-radius:12px;background:var(--card);border:0.5px solid var(--border)`;
+    div.innerHTML = `
+      <div style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--text)">${cat.name}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:1px">${pct}% de ingresos${isAnual?' · prorrata/mes':''}</div>
+        <div style="height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden">
+          <div style="height:100%;border-radius:2px;background:${color};width:${Math.min(pct,100)}%;transition:width 0.4s"></div>
+        </div>
+      </div>
+      ${isAnual
+        ? `<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:700;color:${color}">${f2(displayAmount)}</div><div style="font-size:10px;color:var(--sub)">anual: ${f2(cat.anual||0)}</div></div>`
+        : `<input type="number" value="${amount||''}" placeholder="0"
+            style="width:90px;border:1px solid var(--border);border-radius:8px;padding:7px 9px;font-size:14px;font-weight:600;text-align:right;background:var(--bg);color:var(--text);flex-shrink:0"
+            oninput="saveCatAmount('${cat.name}',this.value)" aria-label="Gasto en ${cat.name}">`
+      }
+      <button onclick="deleteCategory('${cat.name}')" style="background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;flex-shrink:0;padding:2px">✕</button>`;
+    return { div, amount: isAnual ? displayAmount : amount };
+  }
+
+  const fEl = document.getElementById('cat-list-fijos');
+  const vEl = document.getElementById('cat-list-variables');
+  const aEl = document.getElementById('cat-list-anuales');
+  fEl.innerHTML = ''; vEl.innerHTML = ''; aEl.innerHTML = '';
+
+  state.categories.forEach((cat, i) => {
+    const { div, amount } = buildCatCard(cat, i);
+    if (cat.tipo === 'fijo') { fEl.appendChild(div); totalFijos += amount; }
+    else if (cat.tipo === 'anual') { aEl.appendChild(div); totalAnuales += amount; }
+    else { vEl.appendChild(div); totalVariables += amount; }
+  });
+
+  const totalGastos = totalFijos + totalVariables + totalAnuales;
+  const disp = totalIng - totalGastos;
+
+  document.getElementById('g-total-fijos').textContent = f2(totalFijos);
+  document.getElementById('g-total-variables').textContent = f2(totalVariables);
+  document.getElementById('g-total-anuales').textContent = f2(totalAnuales);
+  document.getElementById('g-total-gastos').textContent = f2(totalGastos);
+  document.getElementById('g-disponible').textContent = f2(disp);
+  const dc = document.getElementById('g-disponible-card');
+  if (dc) {
+    dc.style.background = disp >= 0 ? '#dcfce7' : '#fee2e2';
+    dc.querySelector('div').style.color = disp >= 0 ? '#166534' : '#991b1b';
+    dc.querySelector('div:last-child').style.color = disp >= 0 ? '#166534' : '#991b1b';
+  }
+}
+
+function addCategoryModal() {
+  const panel = document.getElementById('add-cat-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  const tipoSel = document.getElementById('new-cat-tipo');
+  const anualInput = document.getElementById('new-cat-anual-importe');
+  tipoSel.onchange = () => {
+    anualInput.style.display = tipoSel.value === 'anual' ? 'block' : 'none';
+  };
+}
+
+function saveIngresos() {
+  const state = loadState();
+  if (!state.gastoMeta[gKey()]) state.gastoMeta[gKey()] = {};
+  state.gastoMeta[gKey()].salario = parseFloat(document.getElementById('ing-salario').value)||0;
+  state.gastoMeta[gKey()].otros = parseFloat(document.getElementById('ing-otros').value)||0;
+  saveState(state);
+}
+
+function saveCatAmount(catName, val) {
+  const state = loadState();
+  if (!state.gastoMeta[gKey()]) state.gastoMeta[gKey()] = {};
+  state.gastoMeta[gKey()]['cat_' + catName] = parseFloat(val)||0;
+  saveState(state);
+  recalc();
+}
+
+function recalc() {
+  saveIngresos();
+  renderGastoTab();
+}
+
+function addCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  const tipo = document.getElementById('new-cat-tipo').value;
+  const anualVal = parseFloat(document.getElementById('new-cat-anual-importe').value)||0;
+  if (!name) return;
+  const state = loadState();
+  const ci = state.categories.length % CAT_COLORS.length;
+  const newCat = { name, tipo, emoji: CAT_EMOJIS[name]||'💰', color: CAT_BG_MAP[name]||CAT_COLORS[ci] };
+  if (tipo === 'anual') newCat.anual = anualVal;
+  state.categories.push(newCat);
+  saveState(state);
+  document.getElementById('new-cat-name').value = '';
+  document.getElementById('new-cat-anual-importe').value = '';
+  document.getElementById('add-cat-panel').style.display = 'none';
+  renderGastoTab();
+}
+
+function deleteCategory(catName) {
+  const state = loadState();
+  state.categories = state.categories.filter(c => c.name !== catName);
+  saveState(state);
+  renderGastoTab();
+}
+
+// ─── BALANCE ──────────────────────────────────────────────────────────────
+function renderBalance() {
+  const state = loadState();
+  const gm = state.gastoMeta[gKey()] || {};
+  const totalIng = (gm.salario||0) + (gm.otros||0);
+  let totalGastos = 0;
+  state.categories.forEach(c => {
+    if (c.tipo === 'anual') totalGastos += (c.anual||0)/12;
+    else totalGastos += (gm['cat_' + c.name]||0);
+  });
+  const disp = totalIng - totalGastos;
+  const tasa = totalIng > 0 ? Math.round((disp/totalIng)*100) : 0;
+
+  document.getElementById('b-ingresos').textContent = f2(totalIng);
+  document.getElementById('b-gastos').textContent = f2(totalGastos);
+  const dispEl = document.getElementById('b-disponible');
+  dispEl.textContent = f2(disp);
+  dispEl.className = 'metric-val ' + (disp >= 0 ? 'green' : 'red');
+  const tasaEl = document.getElementById('b-tasa');
+  tasaEl.textContent = tasa + '%';
+  tasaEl.className = 'metric-val ' + (tasa >= 20 ? 'green' : tasa >= 10 ? 'blue' : 'amber');
+
+  // Donut
+  const labels = [], data = [], colors = [];
+  state.categories.forEach((cat, i) => {
+    const v = cat.tipo==='anual' ? (cat.anual||0)/12 : (gm['cat_' + cat.name]||0);
+    if (v > 0) { labels.push(cat.name); data.push(v); colors.push(cat.color || CAT_COLORS[i%CAT_COLORS.length]); }
+  });
+  document.getElementById('pie-legend').innerHTML = labels.map((l,i)=>
+    `<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:3px;background:${colors[i]};display:inline-block"></span>${l} ${f2(data[i])}</span>`
+  ).join('');
+  if (pieChart) pieChart.destroy();
+  if (data.length) {
+    pieChart = new Chart(document.getElementById('pieChart'), {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+  }
+
+  // Regla 50/30/20 — fijos+anuales = necesidades, variables = split entre ocio y variable
+  const fijosCats = ['Alquiler','Hipoteca','Comunidad','Préstamo papis','Préstamo coche','Seguro coche','Seguro casa'];
+  const ahorCats = ['Inversión y ahorro'];
+  let nec=0, oc=0, ah=0;
+  state.categories.forEach(c => {
+    const v = c.tipo==='anual'?(c.anual||0)/12:(gm['cat_'+c.name]||0);
+    if (ahorCats.includes(c.name)) ah+=v;
+    else if (fijosCats.includes(c.name) || c.tipo==='fijo' || c.tipo==='anual') nec+=v;
+    else oc+=v;
+  });
+  const pn = totalIng>0?Math.round(nec/totalIng*100):0;
+  const po = totalIng>0?Math.round(oc/totalIng*100):0;
+  const pa = totalIng>0?Math.round(ah/totalIng*100):0;
+  const progRow = (label, pct, ideal, color) => `<div class="prog-item">
+    <div class="prog-header"><span class="prog-label">${label}</span><span class="prog-right">${pct}% / ideal ≤${ideal}% <span style="color:${pct<=ideal?'#1a7a35':'var(--red)'}"> ${pct<=ideal?'✓':'↑'}</span></span></div>
+    <div class="prog-bar-wrap"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+  </div>`;
+  document.getElementById('regla5030').innerHTML =
+    progRow('Necesidades (50%)', pn, 50, '#0071e3') +
+    progRow('Ocio y deseos (30%)', po, 30, '#7c3aed') +
+    progRow('Ahorro e inversión (20%)', pa, 100, '#30a46c');
+
+  // Line chart - últimos 6 meses
+  renderLineChart(state);
+}
+
+function renderLineChart(state) {
+  const labels = [], ingData = [], gasData = [];
+  for (let i = 5; i >= 0; i--) {
+    let m = gastoMonth - i; let y = gastoYear;
+    if (m < 0) { m += 12; y--; }
+    const key = `${y}-${String(m+1).padStart(2,'0')}`;
+    const gm = state.gastoMeta[key] || {};
+    labels.push(MSHORT[m]);
+    const ing = (gm.salario||0)+(gm.otros||0);
+    let gas = 0;
+    state.categories.forEach(c => {
+      gas += c.tipo==='anual' ? (c.anual||0)/12 : (gm['cat_'+c.name]||0);
+    });
+    ingData.push(ing); gasData.push(gas);
+  }
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Ingresos', data: ingData, borderColor: '#0071e3', backgroundColor: 'rgba(0,113,227,0.1)', tension: 0.3, fill: true },
+        { label: 'Gastos', data: gasData, borderColor: '#ff453a', backgroundColor: 'rgba(255,69,58,0.1)', tension: 0.3, fill: true }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, labels: { color: '#6c6c70', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6c6c70', font: { size: 11 } }, grid: { display: false } },
+        y: { ticks: { color: '#6c6c70', font: { size: 10 }, callback: v => f2(v) }, grid: { color: 'rgba(0,0,0,0.05)' } }
+      }
+    }
+  });
+}
+
+// ─── OBJETIVOS ────────────────────────────────────────────────────────────
+function renderObjetivos() {
+  const state = loadState();
+  const el = document.getElementById('obj-list');
+  if (!state.objectives.length) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--sub);padding:8px 0">Aún no hay objetivos. Añade uno abajo.</p>';
+    return;
+  }
+  el.innerHTML = state.objectives.map((o, i) => {
+    const pct = o.target > 0 ? Math.min(Math.round((o.saved||0)/o.target*100),100) : 0;
+    return `<div class="obj-item">
+      <div class="obj-header">
+        <span class="obj-name">${o.name}</span>
+        <button class="obj-del" onclick="deleteObj(${i})">eliminar</button>
+      </div>
+      <div class="obj-amounts">${f2(o.saved||0)} aportado de ${f2(o.target)} — ${pct}%</div>
+      <div class="obj-bar"><div class="obj-fill" style="width:${pct}%"></div></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--sub)">Actualizar aportado:</span>
+        <input class="obj-saved-input" type="number" value="${o.saved||0}" oninput="updateObj(${i},this.value)">
+      </div>
+    </div>`;
+  }).join('');
+}
+function addObjetivo() {
+  const name = document.getElementById('obj-name').value.trim();
+  const target = parseFloat(document.getElementById('obj-target').value)||0;
+  if (!name || !target) return;
+  const state = loadState();
+  state.objectives.push({ name, target, saved: 0 });
+  saveState(state);
+  document.getElementById('obj-name').value = '';
+  document.getElementById('obj-target').value = '';
+  renderObjetivos();
+}
+function updateObj(i, v) {
+  const state = loadState();
+  state.objectives[i].saved = parseFloat(v)||0;
+  saveState(state);
+  renderObjetivos();
+}
+function deleteObj(i) {
+  const state = loadState();
+  state.objectives.splice(i, 1);
+  saveState(state);
+  renderObjetivos();
+}
+
+// ─── INVERSIÓN ────────────────────────────────────────────────────────────
+function calcInversion() {
+  const m = parseFloat(document.getElementById('inv-mensual').value)||0;
+  const r = (parseFloat(document.getElementById('inv-tasa').value)||7)/100/12;
+  const n = (parseFloat(document.getElementById('inv-anos').value)||20)*12;
+  const el = document.getElementById('inv-result');
+  if (!m) { el.innerHTML = ''; return; }
+  const fv = m*((Math.pow(1+r,n)-1)/r);
+  const aportado = m*n;
+  const ganancia = fv - aportado;
+  el.innerHTML = `
+    <div class="metric-grid" style="margin-top:0">
+      <div class="metric-card"><div class="metric-label">Capital final</div><div class="metric-val blue">${f2(fv)}</div></div>
+      <div class="metric-card"><div class="metric-label">Lo que aportas</div><div class="metric-val">${f2(aportado)}</div></div>
+      <div class="metric-card"><div class="metric-label">Ganancia</div><div class="metric-val green">${f2(ganancia)}</div></div>
+      <div class="metric-card"><div class="metric-label">Multiplicador</div><div class="metric-val">${(fv/aportado).toFixed(1)}x</div></div>
+    </div>
+    <p style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">Interés compuesto al ${document.getElementById('inv-tasa').value||7}% anual · ${document.getElementById('inv-anos').value||20} años</p>`;
+}
+
+// ─── ANUAL ────────────────────────────────────────────────────────────────
+let anualYear = 2026;
+let ayBarChart = null, ayIrpfChart = null, ayPctChart = null;
+
+const MONTH_PASTELS = ['p-blue','p-indigo','p-violet','p-pink','p-rose','p-orange','p-amber','p-lime','p-green','p-teal','p-cyan','p-blue'];
+
+function changeAnualYear(d) {
+  anualYear += d;
+  document.getElementById('anual-year-label').textContent = anualYear;
+  renderAnual();
+}
+
+function switchAnualTab(tab) {
+  ['resumen','meses','conceptos','grafico'].forEach((t,i) => {
+    document.getElementById('atab-'+t).style.display = t===tab?'block':'none';
+    document.querySelectorAll('.anual-tab')[i].classList.toggle('active', t===tab);
+  });
+  if (tab==='grafico') renderAnualCharts();
+}
+
+function getAnualData(year) {
+  const state = loadState();
+  // Aggregated totals and per-month data
+  const perMonth = [];
+  let totBruto=0, totLiq=0, totIrpf=0, totSS=0, totDietaExenta=0, totDietaTributa=0, totPrestamo=0;
+  const concTotals = {}; // key -> total
+
+  for (let m=0; m<12; m++) {
+    const key = `${year}-${String(m+1).padStart(2,'0')}`;
+    const entries = state.months[key] || [];
+    let mBruto=0, mLiq=0, mIrpf=0, mSS=0, mDietaEx=0, mDietaTrib=0, mPrest=0;
+    entries.forEach(nom => {
+      mBruto  += nom.base_irpf||0;
+      mLiq    += nom.liquido||0;
+      mIrpf   += (nom.retencion_irpf||0)+(nom.ingreso_cuenta_irpf||0);
+      mSS     += nom.cuota_ss||0;
+      mDietaEx  += nom.dieta_desplazamiento||0;
+      mDietaTrib+= nom.dietas_exceso_topes||0;
+      mPrest  += nom.prestamo_ib||0;
+      // accumulate per-concepto
+      const fields = ['sueldo_base','complemento_transitorio','prima_copiloto','prima_productividad',
+        'prima_razon_vuelo','pago_unico','dieta_desplazamiento','dietas_exceso_topes',
+        'retencion_irpf','ingreso_cuenta_irpf','cuota_ss','prestamo_ib','otras_deducciones','liquido'];
+      fields.forEach(f => { concTotals[f] = (concTotals[f]||0) + (nom[f]||0); });
+    });
+    perMonth.push({ m, key, entries, mBruto, mLiq, mIrpf, mSS, mDietaEx, mDietaTrib, mPrest });
+    totBruto+=mBruto; totLiq+=mLiq; totIrpf+=mIrpf; totSS+=mSS;
+    totDietaExenta+=mDietaEx; totDietaTributa+=mDietaTrib; totPrestamo+=mPrest;
+  }
+  return { perMonth, totBruto, totLiq, totIrpf, totSS, totDietaExenta, totDietaTributa, totPrestamo, concTotals };
+}
+
+function renderAnual() {
+  const d = getAnualData(anualYear);
+  const pctMed = d.totBruto>0 ? (d.totIrpf/d.totBruto*100) : 0;
+  const mesesConDatos = d.perMonth.filter(m=>m.entries.length>0).length;
+
+  // KPIs
+  document.getElementById('ay-bruto').textContent = f2k(d.totBruto);
+  document.getElementById('ay-liq').textContent = f2k(d.totLiq);
+  document.getElementById('ay-irpf-total').textContent = f2k(d.totIrpf);
+  document.getElementById('ay-ss-total').textContent = f2k(d.totSS);
+  document.getElementById('ay-pct-irpf').textContent = pctMed.toFixed(1)+'%';
+  document.getElementById('ay-dieta-exenta').textContent = f2k(d.totDietaExenta);
+  document.getElementById('ay-dieta-tributa').textContent = f2k(d.totDietaTributa);
+  document.getElementById('ay-prestamo').textContent = f2k(d.totPrestamo);
+
+  // Meses resumen pill-style
+  const mesesEl = document.getElementById('ay-meses-resumen');
+  mesesEl.innerHTML = d.perMonth.map(m => {
+    if (!m.entries.length) return `<span style="display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;margin:3px;background:var(--bg);color:var(--sub)">${MSHORT[m.m]}</span>`;
+    const tipos = [...new Set(m.entries.map(e=>e.tipo))];
+    const dot = tipos.includes('Extra') ? '⭐' : tipos.includes('Atrasos') ? '🔄' : '✓';
+    return `<span style="display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;margin:3px" class="${MONTH_PASTELS[m.m]}">${dot} ${MSHORT[m.m]}</span>`;
+  }).join('');
+
+  // Nota renta
+  const notaEl = document.getElementById('ay-renta-nota');
+  if (mesesConDatos === 0) {
+    notaEl.innerHTML = 'Aún no hay datos del ejercicio ' + anualYear + '.';
+  } else {
+    const mesesFaltan = 12 - mesesConDatos;
+    notaEl.innerHTML = `
+      <b>Datos de ${mesesConDatos}/12 meses.</b>${mesesFaltan>0?` Faltan ${mesesFaltan} meses.`:' Ejercicio completo.'}<br><br>
+      📌 Base imponible declarada: <b>${f2(d.totBruto)}</b><br>
+      📌 Retenciones a cuenta: <b>${f2(d.totIrpf)}</b><br>
+      📌 Dietas IB032 exentas (no declarar): <b>${f2(d.totDietaExenta)}</b><br>
+      📌 Dietas IB132 (sí tributan, ya en base): <b>${f2(d.totDietaTributa)}</b><br><br>
+      Comprueba que los datos del borrador de Hacienda coinciden con estos totales.`;
+  }
+
+  // Meses cards
+  const mesesCards = document.getElementById('ay-meses-cards');
+  mesesCards.innerHTML = '';
+  d.perMonth.forEach(m => {
+    const div = document.createElement('div');
+    const cls = MONTH_PASTELS[m.m];
+    if (!m.entries.length) {
+      div.className = `mc ${cls}`;
+      div.innerHTML = `<div class="mc-head"><span class="mc-mes">${MONTHS[m.m]}</span></div><div class="mc-empty">Sin datos</div>`;
+      mesesCards.appendChild(div); return;
+    }
+    const tipos = m.entries.map(e=>{
+      const tc = e.tipo==='Nómina Mensual'?'tipo-mensual':e.tipo==='Extra'?'tipo-extra':'tipo-atrasos';
+      return `<span class="tipo-tag ${tc}">${e.tipo==='Nómina Mensual'?'Mens.':e.tipo==='Extra'?'Extra':'Atr.'}</span>`;
+    }).join('');
+    div.className = `mc ${cls}`;
+    div.innerHTML = `
+      <div class="mc-head">
+        <span class="mc-mes">${MONTHS[m.m]}</span>
+        <span>${tipos}</span>
+      </div>
+      <div class="mc-g">
+        <div class="mi"><div class="mi-l">Base IRPF</div><div class="mi-v">${f2(m.mBruto)}</div></div>
+        <div class="mi"><div class="mi-l">Líquido</div><div class="mi-v">${f2(m.mLiq)}</div></div>
+        <div class="mi"><div class="mi-l">IRPF ret.</div><div class="mi-v">${f2(m.mIrpf)}</div></div>
+        <div class="mi"><div class="mi-l">% IRPF</div><div class="mi-v">${m.mBruto>0?(m.mIrpf/m.mBruto*100).toFixed(1)+'%':'—'}</div></div>
+      </div>
+      ${m.mDietaEx>0||m.mDietaTrib>0?`<div class="mc-sep"></div>
+        ${m.mDietaEx>0?`<div class="mc-c"><span>🟢 Dieta IB032 (exenta)</span><span>${f2(m.mDietaEx)}</span></div>`:''}
+        ${m.mDietaTrib>0?`<div class="mc-c"><span>🔴 Dieta IB132 (tributa)</span><span>${f2(m.mDietaTrib)}</span></div>`:''}
+      `:''}
+      ${m.mSS>0?`<div class="mc-sep"></div><div class="mc-c"><span>Cuotas SS</span><span>${f2(m.mSS)}</span></div>`:''}
+      ${m.mPrest>0?`<div class="mc-c"><span>Préstamo Iberia</span><span>${f2(m.mPrest)}</span></div>`:''}`;
+    mesesCards.appendChild(div);
+  });
+
+  // Conceptos
+  const concLabels = {
+    sueldo_base:{l:'Sueldo base (IB001)',g:'dev',color:'#1e40af'},
+    complemento_transitorio:{l:'Complemento transitorio (IB010)',g:'dev',color:'#3730a3'},
+    prima_copiloto:{l:'Prima copiloto (IB017)',g:'dev',color:'#5b21b6'},
+    prima_productividad:{l:'Prima productividad (IB033A)',g:'dev',color:'#7c3aed'},
+    prima_razon_vuelo:{l:'Prima razón viaje (IB021)',g:'dev',color:'#9d174d'},
+    pago_unico:{l:'Pago único (IB075)',g:'dev',color:'#9a3412'},
+    dieta_desplazamiento:{l:'🟢 Dieta IB032 — EXENTA IRPF',g:'dev',color:'#166534'},
+    dietas_exceso_topes:{l:'🔴 Dieta IB132 — Tributa IRPF',g:'dev',color:'#92400e'},
+    retencion_irpf:{l:'Retención IRPF',g:'ded',color:'#9f1239'},
+    ingreso_cuenta_irpf:{l:'Ingreso a cuenta (billetes)',g:'ded',color:'#7c3aed'},
+    cuota_ss:{l:'Cuotas Seguridad Social',g:'ded',color:'#1e40af'},
+    prestamo_ib:{l:'Préstamo Iberia (IB221)',g:'ded',color:'#134e4a'},
+    otras_deducciones:{l:'Otras deducciones',g:'ded',color:'#3f6212'},
+  };
+  const devEl = document.getElementById('ay-conc-devengos');
+  const dedEl = document.getElementById('ay-conc-deducc');
+  devEl.innerHTML = ''; dedEl.innerHTML = '';
+  Object.entries(concLabels).forEach(([k,v]) => {
+    const val = d.concTotals[k]||0;
+    if (val <= 0) return;
+    const row = `<div class="conc-row">
+      <div style="display:flex;align-items:center">
+        <div class="conc-dot" style="background:${v.color}"></div>
+        <span style="font-size:13px;color:var(--text)">${v.l}</span>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:var(--text)">${f2(val)}</span>
+    </div>`;
+    (v.g==='dev'?devEl:dedEl).innerHTML += row;
+  });
+  if (!devEl.innerHTML) devEl.innerHTML = '<p style="font-size:13px;color:var(--sub);padding:8px 0">Sin datos</p>';
+  if (!dedEl.innerHTML) dedEl.innerHTML = '<p style="font-size:13px;color:var(--sub);padding:8px 0">Sin datos</p>';
+}
+
+function renderAnualCharts() {
+  const d = getAnualData(anualYear);
+  const labels = MSHORT;
+  const brutos = d.perMonth.map(m=>m.mBruto);
+  const liqs = d.perMonth.map(m=>m.mLiq);
+  const irpfs = d.perMonth.map(m=>m.mIrpf);
+  const pcts = d.perMonth.map(m=>m.mBruto>0?parseFloat((m.mIrpf/m.mBruto*100).toFixed(1)):0);
+
+  const TICK_COLOR = '#6c6c70';
+  const commonScales = {
+    x:{ticks:{color:TICK_COLOR,font:{size:10}},grid:{display:false}},
+    y:{ticks:{color:TICK_COLOR,font:{size:10},callback:v=>v>0?Math.round(v/1000)+'k':0},grid:{color:'rgba(128,128,128,0.1)'}}
+  };
+
+  if (ayBarChart) ayBarChart.destroy();
+  ayBarChart = new Chart(document.getElementById('ay-bar-chart'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Base IRPF',data:brutos,backgroundColor:'rgba(59,130,246,0.7)',borderRadius:4},
+      {label:'Líquido',data:liqs,backgroundColor:'rgba(34,197,94,0.7)',borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:TICK_COLOR,font:{size:11}}}},scales:commonScales}
+  });
+
+  if (ayIrpfChart) ayIrpfChart.destroy();
+  ayIrpfChart = new Chart(document.getElementById('ay-irpf-chart'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'IRPF retenido',data:irpfs,backgroundColor:'rgba(239,68,68,0.7)',borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:TICK_COLOR,font:{size:11}}}},scales:commonScales}
+  });
+
+  if (ayPctChart) ayPctChart.destroy();
+  ayPctChart = new Chart(document.getElementById('ay-pct-chart'),{
+    type:'line',
+    data:{labels,datasets:[{label:'% IRPF',data:pcts,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.1)',tension:0.3,fill:true,pointRadius:4,pointBackgroundColor:'#8b5cf6'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:TICK_COLOR,font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:TICK_COLOR,font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:TICK_COLOR,font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(128,128,128,0.1)'},min:0}
+      }}
+  });
+}
+
+// compact format for KPI cells (k suffix)
+function f2k(n) {
+  if (!n) return '0 €';
+  if (Math.abs(n) >= 10000) return Math.round(n/1000).toLocaleString('es-ES')+'k €';
+  return (n||0).toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
+}
+
+
+function f2(n) {
+  return (n||0).toLocaleString('es-ES', { minimumFractionDigits:2, maximumFractionDigits:2 }) + ' €';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+initApp();
+</script>
+</body>
+</html>
